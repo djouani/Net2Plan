@@ -12,7 +12,7 @@ public class ExcelMain
 {
     public static void main(String[] args)
     {
-        File file = new File("C:\\Users\\Jorge\\Desktop\\Hola.xls");
+        File file = new File("C:\\Users\\Jorge\\Desktop\\Ejemplo.xlsx");
         ExcelReader reader = new ExcelReader(file);
         reader.readExcel(ExcelReader.Net2PlanExcelSheetName.Nodes);
     }
