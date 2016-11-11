@@ -14,6 +14,6 @@ public class ExcelMain
     {
         File file = new File("C:\\Users\\Jorge\\Desktop\\Ejemplo.xlsx");
         ExcelReader reader = new ExcelReader(file);
-        reader.readExcel(ExcelReader.Net2PlanExcelSheetName.Nodes);
+        reader.readExcel(null);
     }
 }
