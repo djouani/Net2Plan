@@ -452,10 +452,11 @@ public class TopologyPanel extends JPanel implements ActionListener//FrequentisB
             callback.reset();
         } else if (src == btn_debug)
         {
+            // Load new topology
             final ExcelReader reader = new ExcelReader(new File("C:\\Users\\Jorge\\Desktop\\Ejemplo.xlsx"));
-            reader.readExcel(callback);
-            this.getCanvas().refresh();
-            callback.updateNetPlanView();
+            final NetPlan netPlan = reader.readExcel(callback);
+
+            callback.loadDesign(netPlan);
         }
     }
 
@@ -533,10 +534,7 @@ public class TopologyPanel extends JPanel implements ActionListener//FrequentisB
 
             aux.checkCachesConsistency();
 
-
             callback.loadDesign(aux);
-
-
         } catch (Net2PlanException ex)
         {
             if (ErrorHandling.isDebugEnabled()) ErrorHandling.addErrorOrException(ex, TopologyPanel.class);

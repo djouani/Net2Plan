@@ -1,8 +1,12 @@
 package com.net2plan.io.excelIO;
 
+import com.google.common.base.Splitter;
 import com.net2plan.gui.utils.INetworkCallback;
+import com.net2plan.interfaces.networkDesign.Link;
+import com.net2plan.interfaces.networkDesign.Net2PlanException;
 import com.net2plan.interfaces.networkDesign.NetPlan;
 import com.net2plan.interfaces.networkDesign.Node;
+import com.net2plan.internal.ErrorHandling;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -16,6 +20,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -46,26 +52,37 @@ public class ExcelReader
      * Method through which the parser is launched.
      * Reads a given sheet of the excel file and transforms its contents into the given NetPlan.
      */
-    public void readExcel(final INetworkCallback callback)
+    public NetPlan readExcel(final INetworkCallback callback)
     {
         this.callback = callback;
-        this.netPlan = callback.getDesign();
+        this.netPlan = new NetPlan();
 
         // Checking the version of the xml file
         final String fileExtension = FilenameUtils.getExtension(excelFile.getName());
 
-        switch (fileExtension)
+        try
         {
-            case OLE2_EXTENSION:
-                readOLE2();
-                break;
-            case OOXML_EXTENSION:
-                readOOXML();
-                break;
-            default:
-                // Unknown file format, do not proceed.
-                throw new Net2PlanExcelException("Unknown file format: ." + fileExtension);
+            switch (fileExtension)
+            {
+                case OLE2_EXTENSION:
+                    readOLE2();
+                    break;
+                case OOXML_EXTENSION:
+                    readOOXML();
+                    break;
+                default:
+                    // Unknown file format, do not proceed.
+                    throw new Net2PlanExcelException("Unknown file format: ." + fileExtension);
+            }
+        } catch (Net2PlanException ex)
+        {
+            ex.printStackTrace();
+            ErrorHandling.showErrorDialog("Error while reading Excel");
+
+            this.netPlan = new NetPlan();
         }
+
+        return netPlan;
     }
 
     /**
@@ -78,11 +95,15 @@ public class ExcelReader
             final XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(excelFile));
 
             final int numberOfSheets = workbook.getNumberOfSheets();
-
             // Going through all sheets.
             for (int i = 0; i < numberOfSheets; i++)
             {
                 final XSSFSheet spreadSheet = workbook.getSheetAt(i);
+
+                if (i == 0 && !spreadSheet.getSheetName().equals(ExcelConstants.SHEET_NODES))
+                {
+                    throw new Net2PlanExcelException("Nodes sheet must be first page on excel file.");
+                }
 
                 // Finding out what sheet I an on.
                 final String sheetName = spreadSheet.getSheetName();
@@ -137,11 +158,9 @@ public class ExcelReader
                     }
                 }
             }
-
-
-        } catch (Exception ex)
+        } catch (IOException e)
         {
-            ex.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -190,24 +209,34 @@ public class ExcelReader
     /**
      * Actual parser
      */
-    private void doRead(final Map<String, String> headerToValueMap)
+    private void doRead(final Map<String, String> headerToValue)
     {
         switch (excelSheetName)
         {
             case Nodes:
                 // Creating the nodes of the topology
-                final Node node = netPlan.addNode(Double.parseDouble(headerToValueMap.get("xCoord")), Double.parseDouble(headerToValueMap.get("yCoord")), headerToValueMap.get("Name"), null);
+                final Node node = netPlan.addNode(Double.parseDouble(headerToValue.get(ExcelConstants.NODE_X)), Double.parseDouble(headerToValue.get(ExcelConstants.NODE_Y)), headerToValue.get(ExcelConstants.NODE_NAME), readAttributes(headerToValue.get(ExcelConstants.NODE_ATTRIBUTES)));
                 callback.getTopologyPanel().getCanvas().addNode(node);
                 break;
             case Links:
+                final Link link = netPlan.addLink(netPlan.getNodeByName(headerToValue.get(ExcelConstants.LINK_ORIGIN)), netPlan.getNodeByName(headerToValue.get(ExcelConstants.LINK_DESTINATION)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_CAPACITY)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_LENGTH)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_PROPAGATION)), readAttributes(headerToValue.get(ExcelConstants.LINK_ATTRIBUTES)));
+                callback.getTopologyPanel().getCanvas().addLink(link);
                 break;
         }
     }
 
+    private Map<String, String> readAttributes(final String attributes)
+    {
+        // Structure => key:value;key:value...
+        if (attributes == null || attributes.isEmpty()) return null;
+        else
+            return Splitter.on(ExcelConstants.ATTRIBUTE_SEPARATOR).withKeyValueSeparator(ExcelConstants.ATTRIBUTE_PAIR_SEPARATOR).split(attributes);
+    }
+
     public enum Net2PlanExcelSheetName
     {
-        Nodes("Nodes"),
-        Links("Links");
+        Nodes(ExcelConstants.SHEET_NODES),
+        Links(ExcelConstants.SHEET_LINKS);
 
         private final String text;
 
