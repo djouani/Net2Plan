@@ -8,19 +8,13 @@ import com.net2plan.interfaces.networkDesign.NetPlan;
 import com.net2plan.interfaces.networkDesign.Node;
 import com.net2plan.internal.ErrorHandling;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
@@ -94,70 +88,7 @@ public class ExcelReader
         {
             final XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(excelFile));
 
-            final int numberOfSheets = workbook.getNumberOfSheets();
-            // Going through all sheets.
-            for (int i = 0; i < numberOfSheets; i++)
-            {
-                final XSSFSheet spreadSheet = workbook.getSheetAt(i);
-
-                if (i == 0 && !spreadSheet.getSheetName().equals(ExcelConstants.SHEET_NODES))
-                {
-                    throw new Net2PlanExcelException("Nodes sheet must be first page on excel file.");
-                }
-
-                // Finding out what sheet I an on.
-                final String sheetName = spreadSheet.getSheetName();
-                excelSheetName = Net2PlanExcelSheetName.valueOf(sheetName);
-
-                final DataFormatter formatter = new DataFormatter();
-                final FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-
-                // The first row must always be the header row
-                // Contains the header columns in order
-                final LinkedList<String> tableHeader = new LinkedList<>();
-
-                // The first iteration is not parsed. Instead, its values are later used as the keys for the rows' maps.
-                XSSFRow row;
-                final Iterator<Row> iterator = spreadSheet.iterator();
-                if (iterator.hasNext())
-                {
-                    row = (XSSFRow) iterator.next();
-
-                    final Iterator<Cell> cellIterator = row.cellIterator();
-                    while (cellIterator.hasNext())
-                    {
-                        final Cell cell = cellIterator.next();
-
-                        // All parameters will be read as String.
-                        evaluator.evaluate(cell);
-                        final String value = formatter.formatCellValue(cell, evaluator);
-
-                        tableHeader.add(value);
-                    }
-
-                    while (iterator.hasNext())
-                    {
-                        row = (XSSFRow) iterator.next();
-
-                        final Map<String, String> headerToValueMap = new HashMap<>();
-
-                        final Iterator<Cell> cIterator = row.cellIterator();
-                        while (cIterator.hasNext())
-                        {
-                            final Cell cell = cIterator.next();
-
-                            // All parameters will be read as String.
-                            evaluator.evaluate(cell);
-                            final String value = formatter.formatCellValue(cell, evaluator);
-
-                            headerToValueMap.put(tableHeader.get(cell.getColumnIndex()), value);
-                        }
-
-                        // Parse row
-                        doRead(headerToValueMap);
-                    }
-                }
-            }
+            readLoop(workbook);
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -173,36 +104,79 @@ public class ExcelReader
         {
             final POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(excelFile));
             final HSSFWorkbook wb = new HSSFWorkbook(fs);
-            final HSSFSheet spreadSheet = wb.getSheet(excelSheetName.toString());
 
-            if (spreadSheet == null)
-            {
-                throw new Net2PlanExcelException("Could not find sheet: " + excelSheetName.toString());
-            }
-
-            HSSFRow row;
-            HSSFCell cell;
-
-            final int rows = spreadSheet.getLastRowNum() + 1;
-
-            for (int r = 0; r < rows; r++)
-            {
-                row = spreadSheet.getRow(r);
-                if (row != null)
-                {
-                    for (int c = 0; c < row.getLastCellNum(); c++)
-                    {
-                        cell = row.getCell(c);
-                        if (cell != null)
-                        {
-                            // TODO: Parse
-                        }
-                    }
-                }
-            }
+            readLoop(wb);
         } catch (Exception ioe)
         {
             ioe.printStackTrace();
+        }
+    }
+
+    private void readLoop(final Workbook workbook)
+    {
+        final int numberOfSheets = workbook.getNumberOfSheets();
+        // Going through all sheets.
+        for (int i = 0; i < numberOfSheets; i++)
+        {
+            final Sheet spreadSheet = workbook.getSheetAt(i);
+
+            if (i == 0 && !spreadSheet.getSheetName().equals(ExcelConstants.SHEET_NODES))
+            {
+                throw new Net2PlanExcelException("Nodes sheet must be first page on excel file.");
+            }
+
+            // Finding out what sheet I an on.
+            final String sheetName = spreadSheet.getSheetName();
+            excelSheetName = Net2PlanExcelSheetName.valueOf(sheetName);
+
+            final DataFormatter formatter = new DataFormatter();
+            final FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+            // The first row must always be the header row
+            // Contains the header columns in order
+            final LinkedList<String> tableHeader = new LinkedList<>();
+
+            // The first iteration is not parsed. Instead, its values are later used as the keys for the rows' maps.
+            Row row;
+            final Iterator<Row> iterator = spreadSheet.iterator();
+            if (iterator.hasNext())
+            {
+                row = iterator.next();
+
+                final Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext())
+                {
+                    final Cell cell = cellIterator.next();
+
+                    // All parameters will be read as String.
+                    evaluator.evaluate(cell);
+                    final String value = formatter.formatCellValue(cell, evaluator);
+
+                    tableHeader.add(value);
+                }
+
+                while (iterator.hasNext())
+                {
+                    row = iterator.next();
+
+                    final Map<String, String> headerToValueMap = new HashMap<>();
+
+                    final Iterator<Cell> cIterator = row.cellIterator();
+                    while (cIterator.hasNext())
+                    {
+                        final Cell cell = cIterator.next();
+
+                        // All parameters will be read as String.
+                        evaluator.evaluate(cell);
+                        final String value = formatter.formatCellValue(cell, evaluator);
+
+                        headerToValueMap.put(tableHeader.get(cell.getColumnIndex()), value);
+                    }
+
+                    // Parse row
+                    doRead(headerToValueMap);
+                }
+            }
         }
     }
 
