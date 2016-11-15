@@ -1,6 +1,5 @@
 package com.net2plan.io.excelIO;
 
-import com.google.common.base.Splitter;
 import com.net2plan.gui.utils.INetworkCallback;
 import com.net2plan.interfaces.networkDesign.Link;
 import com.net2plan.interfaces.networkDesign.Net2PlanException;
@@ -114,16 +113,14 @@ public class ExcelReader
 
     private void readLoop(final Workbook workbook)
     {
-        final int numberOfSheets = workbook.getNumberOfSheets();
-        // Going through all sheets.
-        for (int i = 0; i < numberOfSheets; i++)
-        {
-            final Sheet spreadSheet = workbook.getSheetAt(i);
+        final LinkedHashSet<Sheet> sheets = checkSheetOrder(workbook);
 
-            if (i == 0 && !spreadSheet.getSheetName().equals(ExcelConstants.SHEET_NODES))
-            {
-                throw new Net2PlanExcelException("Nodes sheet must be first page on excel file.");
-            }
+        final Iterator<Sheet> sheetIterator = sheets.iterator();
+
+        // Going through all sheets.
+        while (sheetIterator.hasNext())
+        {
+            final Sheet spreadSheet = sheetIterator.next();
 
             // Finding out what sheet I an on.
             final String sheetName = spreadSheet.getSheetName();
@@ -187,30 +184,56 @@ public class ExcelReader
     {
         switch (excelSheetName)
         {
+            case Layers:
+                netPlan.addLayer(headerToValue.get(ExcelConstants.LAYER_NAME), headerToValue.get(ExcelConstants.LAYER_DESCRIPTION), headerToValue.get(ExcelConstants.LAYER_LINK_UNIT), headerToValue.get(ExcelConstants.LAYER_DEMAND_UNIT), ExcelTools.readAttributes(headerToValue.get(ExcelConstants.LAYER_ATTRIBUTES)));
             case Nodes:
                 // Creating the nodes of the topology
-                final Node node = netPlan.addNode(Double.parseDouble(headerToValue.get(ExcelConstants.NODE_X)), Double.parseDouble(headerToValue.get(ExcelConstants.NODE_Y)), headerToValue.get(ExcelConstants.NODE_NAME), readAttributes(headerToValue.get(ExcelConstants.NODE_ATTRIBUTES)));
+                final Node node = netPlan.addNode(Double.parseDouble(headerToValue.get(ExcelConstants.NODE_X)), Double.parseDouble(headerToValue.get(ExcelConstants.NODE_Y)), headerToValue.get(ExcelConstants.NODE_NAME), ExcelTools.readAttributes(headerToValue.get(ExcelConstants.NODE_ATTRIBUTES)));
                 callback.getTopologyPanel().getCanvas().addNode(node);
                 break;
             case Links:
-                final Link link = netPlan.addLink(netPlan.getNodeByName(headerToValue.get(ExcelConstants.LINK_ORIGIN)), netPlan.getNodeByName(headerToValue.get(ExcelConstants.LINK_DESTINATION)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_CAPACITY)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_LENGTH)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_PROPAGATION)), readAttributes(headerToValue.get(ExcelConstants.LINK_ATTRIBUTES)));
+                final Link link = netPlan.addLink(netPlan.getNodeByName(headerToValue.get(ExcelConstants.LINK_ORIGIN)), netPlan.getNodeByName(headerToValue.get(ExcelConstants.LINK_DESTINATION)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_CAPACITY)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_LENGTH)), Double.parseDouble(headerToValue.get(ExcelConstants.LINK_PROPAGATION)), ExcelTools.readAttributes(headerToValue.get(ExcelConstants.LINK_ATTRIBUTES)));
                 callback.getTopologyPanel().getCanvas().addLink(link);
+                break;
+            case Demands:
+                netPlan.addDemand(netPlan.getNodeByName(headerToValue.get(ExcelConstants.DEMAND_INGRESS_NODE)), netPlan.getNodeByName(headerToValue.get(ExcelConstants.DEMAND_EGRESS_NODE)), Double.parseDouble(headerToValue.get(ExcelConstants.DEMAND_OFFERED_TRAFFIC)), ExcelTools.readAttributes(headerToValue.get(ExcelConstants.DEMAND_ATTRIBUTES)));
+                break;
+            case Multicast_Demands:
+                netPlan.addMulticastDemand(netPlan.getNodeByName(headerToValue.get(ExcelConstants.MULTICAST_INGRESS_NODE)), ExcelTools.getSequenceOfNodes(netPlan, headerToValue.get(ExcelConstants.MULTICAST_EGRESS_NODES)), Double.parseDouble(headerToValue.get(ExcelConstants.MULTICAST_OFFERED_TRAFFIC)), ExcelTools.readAttributes(headerToValue.get(ExcelConstants.MULTICAST_ATTRIBUTES)));
+                break;
+            case Routes:
+                break;
+            case Multicast_Trees:
+                break;
+            case Protection_Segments:
+                break;
+            case Shared_risk_Groups:
+                break;
+            case Forwarding_Rules:
+                break;
+            default:
                 break;
         }
     }
 
-    private Map<String, String> readAttributes(final String attributes)
+    private LinkedHashSet<Sheet> checkSheetOrder(final Workbook wb)
     {
-        // Structure => key:value;key:value...
-        if (attributes == null || attributes.isEmpty()) return null;
-        else
-            return Splitter.on(ExcelConstants.ATTRIBUTE_SEPARATOR).withKeyValueSeparator(ExcelConstants.ATTRIBUTE_PAIR_SEPARATOR).split(attributes);
+        // TODO
+        return new LinkedHashSet<>();
     }
 
     public enum Net2PlanExcelSheetName
     {
+        Layers(ExcelConstants.SHEET_LAYERS),
         Nodes(ExcelConstants.SHEET_NODES),
-        Links(ExcelConstants.SHEET_LINKS);
+        Links(ExcelConstants.SHEET_LINKS),
+        Demands(ExcelConstants.SHEET_DEMANDS),
+        Multicast_Demands(ExcelConstants.SHEET_MULTICAST_DEMANDS),
+        Routes(ExcelConstants.SHEET_ROUTES),
+        Multicast_Trees(ExcelConstants.SHEET_MULTICAST_TREES),
+        Protection_Segments(ExcelConstants.SHEET_PROTECTION_SEGMENTS),
+        Shared_risk_Groups(ExcelConstants.SHEET_RISK_GROUPS),
+        Forwarding_Rules(ExcelConstants.SHEET_FORWARDING_RULES);
 
         private final String text;
 
