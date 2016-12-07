@@ -137,7 +137,7 @@ public class VisualizationFiltersPane extends JPanel
                 mainWindow.updateNetPlanView();
             }
         });
-        andButton = new JRadioButton("AND filtering mode");
+        andButton = new JRadioButton("All-in filtering mode (Shows the Network Element if is visible in all filters)");
         andButton.addItemListener(new ItemListener()
         {
             @Override
@@ -151,7 +151,7 @@ public class VisualizationFiltersPane extends JPanel
                 }
             }
         });
-        orButton = new JRadioButton("OR filtering mode");
+        orButton = new JRadioButton("One-in filtering mode (Shows the Network Element if is visible in, at least, one of the filters)");
         orButton.addItemListener(new ItemListener()
         {
             @Override
@@ -195,16 +195,16 @@ public class VisualizationFiltersPane extends JPanel
         });
         andButton.setSelected(true);
         setLayout(new MigLayout("", "[][grow][]", "[][][][][grow]"));
-        add(new JLabel("Filters File"));
-        add(txt_file, "grow");
-        add(load, "spanx");
+        add(new JLabel("Filters File"),"spanx");
+        add(txt_file, "grow, spanx");
+        add(load, "spanx ");
         add(new JLabel("Filtering Options"), "top, growx, spanx 2, wrap, wmin 100");
-        add(andButton);
+        add(andButton,"wrap");
         add(orButton, "wrap");
         add(new JLabel("Filters"), "spanx 3, wrap");
         add(deleteAll);
         add(activeAll);
-        add(deactiveAll, "wrap");
+        add(deactiveAll, "spanx 3, wrap");
         add(new JScrollPane(table), "spanx 3, grow, wrap");
         add(new JLabel("Description"), "spanx 3, wrap");
         add(new JScrollPane(descriptionArea),"spanx 3, grow, wrap");
@@ -221,6 +221,8 @@ public class VisualizationFiltersPane extends JPanel
                 if(clickedColumn == 0)
                 {
                     VisualizationFiltersController.removeVisualizationFilter(selectedFilter);
+                    if(VisualizationFiltersController.getCurrentVisualizationFilters().size() == 0)
+                        txt_file.setText("");
                     descriptionArea.setText("");
                     updateFiltersTable();
                     mainWindow.updateNetPlanView();
