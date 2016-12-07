@@ -14,6 +14,7 @@ import com.net2plan.utils.Pair;
     //Value: Double*/
 public interface IVisualizationFilter extends IExternal
 {
+    public boolean active = false;
     public boolean isVisibleNetworkElement(NetworkElement element);
     public boolean isVisibleForwardingRules(Pair<Demand,Link> fRuleKey, Double fRuleValue);
     public String getDescription();
