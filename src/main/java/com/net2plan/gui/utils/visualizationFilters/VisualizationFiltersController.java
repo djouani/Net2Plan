@@ -2,6 +2,7 @@ package com.net2plan.gui.utils.visualizationFilters;
 
 import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.utils.Pair;
+import sun.nio.ch.Net;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -121,6 +122,8 @@ public final class VisualizationFiltersController
     public static boolean isVisibleNetworkElement(NetworkElement element)
     {
 
+        if(element == null)
+            throw new Net2PlanException("Null elements are not avoided");
         boolean isVisible = true;
         if(currentVisualizationFilters.size() == 0) return true;
         if(areAllFiltersInactive()) return true;
@@ -162,6 +165,8 @@ public final class VisualizationFiltersController
 
     public static boolean isVisibleForwardingRules(Pair<Demand,Link> fRuleKey, Double fRuleValue)
     {
+        if (fRuleKey == null || fRuleValue == null)
+            throw new Net2PlanException("Null forwarding rules are not avoided");
         boolean isVisible = true;
         if(currentVisualizationFilters.size() == 0) return true;
         if(areAllFiltersInactive()) return true;
