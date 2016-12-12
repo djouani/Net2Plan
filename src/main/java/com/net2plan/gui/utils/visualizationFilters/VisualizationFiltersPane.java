@@ -137,7 +137,7 @@ public class VisualizationFiltersPane extends JPanel
                 mainWindow.updateNetPlanView();
             }
         });
-        andButton = new JRadioButton("All-in filtering mode (Shows the Network Element if is visible in all filters)");
+        andButton = new JRadioButton("AND filtering mode (Shows the Network Element if is visible in all filters)");
         andButton.addItemListener(new ItemListener()
         {
             @Override
@@ -151,7 +151,7 @@ public class VisualizationFiltersPane extends JPanel
                 }
             }
         });
-        orButton = new JRadioButton("One-in filtering mode (Shows the Network Element if is visible in, at least, one of the filters)");
+        orButton = new JRadioButton("OR filtering mode (Shows the Network Element if is visible in, at least, one of the filters)");
         orButton.addItemListener(new ItemListener()
         {
             @Override
