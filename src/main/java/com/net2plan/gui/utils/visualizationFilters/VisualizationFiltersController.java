@@ -123,7 +123,7 @@ public final class VisualizationFiltersController
     {
 
         if(element == null)
-            throw new Net2PlanException("Null elements are not avoided");
+            throw new Net2PlanException("Null network elements are not allowed");
         boolean isVisible = true;
         if(currentVisualizationFilters.size() == 0) return true;
         if(areAllFiltersInactive()) return true;
@@ -166,7 +166,7 @@ public final class VisualizationFiltersController
     public static boolean isVisibleForwardingRules(Pair<Demand,Link> fRuleKey, Double fRuleValue)
     {
         if (fRuleKey == null || fRuleValue == null)
-            throw new Net2PlanException("Null forwarding rules are not avoided");
+            throw new Net2PlanException("Null forwarding rules are not allowed");
         boolean isVisible = true;
         if(currentVisualizationFilters.size() == 0) return true;
         if(areAllFiltersInactive()) return true;
