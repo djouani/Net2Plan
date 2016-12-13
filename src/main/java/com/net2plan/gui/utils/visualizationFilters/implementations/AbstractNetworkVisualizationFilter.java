@@ -32,7 +32,7 @@ public abstract class AbstractNetworkVisualizationFilter implements IVisualizati
     @Override
     public boolean executeFilterForForwardingRule(Pair<Demand, Link> fRuleKey, Double fRuleValue)
     {
-        return false;
+        return true;
     }
 
     @Override

@@ -32,7 +32,7 @@ public abstract class AbstractForwardingRulesVisualizationFilter implements IVis
     @Override
     public boolean executeFilterForNetworkElement(NetworkElement element)
     {
-        return false;
+        return true;
     }
 
     @Override

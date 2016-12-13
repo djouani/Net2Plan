@@ -37,7 +37,7 @@ public class TestFilter extends AbstractNetworkVisualizationFilter
     @Override
     public String getUniqueName()
     {
-        return null;
+        return "Test Filter...";
     }
 
     @Override
