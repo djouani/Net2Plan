@@ -1,4 +1,4 @@
-package com.net2plan.gui.utils.visualizationFilters;
+package com.net2plan.interfaces.networkDesign;
 
 import com.net2plan.interfaces.networkDesign.Demand;
 import com.net2plan.interfaces.networkDesign.Link;
@@ -18,8 +18,8 @@ import java.util.Map;
 public interface IVisualizationFilter extends IExternal
 {
     public boolean active = false;
-    public boolean isVisibleNetworkElement(NetworkElement element);
-    public boolean isVisibleForwardingRules(Pair<Demand,Link> fRuleKey, Double fRuleValue);
+    public boolean executeFilterForNetworkElement(NetworkElement element);
+    public boolean executeFilterForForwardingRule(Pair<Demand,Link> fRuleKey, Double fRuleValue);
     public String getDescription();
     public String getUniqueName();
     public boolean isActive();
