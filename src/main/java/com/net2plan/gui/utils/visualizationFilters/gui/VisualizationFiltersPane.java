@@ -1,11 +1,9 @@
-package com.net2plan.gui.utils.visualizationFilters;
+package com.net2plan.gui.utils.visualizationFilters.gui;
 
 import com.net2plan.gui.utils.*;
 import com.net2plan.gui.utils.offlineExecPane.OfflineExecutionPanel;
-import com.net2plan.interfaces.networkDesign.Configuration;
-import com.net2plan.interfaces.networkDesign.IAlgorithm;
-import com.net2plan.interfaces.networkDesign.Net2PlanException;
-import com.net2plan.interfaces.networkDesign.NetPlan;
+import com.net2plan.gui.utils.visualizationFilters.VisualizationFiltersController;
+import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.internal.Constants;
 import com.net2plan.internal.ErrorHandling;
 import com.net2plan.internal.IExternal;

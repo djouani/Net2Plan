@@ -2,11 +2,8 @@ package com.net2plan.gui.utils.visualizationFilters;
 
 import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.utils.Pair;
-import sun.nio.ch.Net;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author César
@@ -16,49 +13,64 @@ public final class VisualizationFiltersController
 {
     private static ArrayList<IVisualizationFilter> currentVisualizationFilters;
     private static String filteringMode = "AND";
-    static{
+
+    static
+    {
 
         currentVisualizationFilters = new ArrayList<>();
     }
-    private VisualizationFiltersController(){
+
+    private VisualizationFiltersController()
+    {
 
 
     }
-    public static void addVisualizationFilter(IVisualizationFilter vf){
 
-        if(containsVisualizationFilter(vf)){
+    public static void addVisualizationFilter(IVisualizationFilter vf)
+    {
+
+        if (containsVisualizationFilter(vf))
+        {
             throw new Net2PlanException("A visualization filter with the same name has been already added");
         }
-        if(vf == null){
+        if (vf == null)
+        {
             throw new Net2PlanException("A null visualization filter cannot be added");
-        }
-        else{
+        } else
+        {
             currentVisualizationFilters.add(vf);
         }
 
     }
 
-    public static void removeVisualizationFilter(String visFilterName){
+    public static void removeVisualizationFilter(String visFilterName)
+    {
 
-        for(IVisualizationFilter vf : currentVisualizationFilters){
-            if(visFilterName.equals(vf.getUniqueName())){
+        for (IVisualizationFilter vf : currentVisualizationFilters)
+        {
+            if (visFilterName.equals(vf.getUniqueName()))
+            {
                 currentVisualizationFilters.remove(vf);
                 break;
             }
         }
     }
-    public static ArrayList<IVisualizationFilter> getCurrentVisualizationFilters(){
+
+    public static ArrayList<IVisualizationFilter> getCurrentVisualizationFilters()
+    {
 
         return currentVisualizationFilters;
     }
 
 
-    public static boolean containsVisualizationFilter(IVisualizationFilter vf){
+    public static boolean containsVisualizationFilter(IVisualizationFilter vf)
+    {
 
         boolean flag = false;
-        for(IVisualizationFilter vfg : currentVisualizationFilters)
+        for (IVisualizationFilter vfg : currentVisualizationFilters)
         {
-            if(vfg.getUniqueName().equals(vf.getUniqueName())){
+            if (vfg.getUniqueName().equals(vf.getUniqueName()))
+            {
                 flag = true;
                 break;
             }
@@ -66,16 +78,19 @@ public final class VisualizationFiltersController
         return flag;
     }
 
-    public static void removeAllVisualizationFilters(){
+    public static void removeAllVisualizationFilters()
+    {
 
         currentVisualizationFilters.clear();
     }
 
-    public static void updateFilteringMode(String newFilteringMode){
+    public static void updateFilteringMode(String newFilteringMode)
+    {
 
         FilteringModes currentMode = FilteringModes.fromStringToEnum(newFilteringMode);
 
-        switch(currentMode){
+        switch (currentMode)
+        {
 
             case AND:
                 filteringMode = "AND";
@@ -86,11 +101,14 @@ public final class VisualizationFiltersController
         }
     }
 
-    public static IVisualizationFilter getVisualizationFilterByName(String visFilterName){
-        
+    public static IVisualizationFilter getVisualizationFilterByName(String visFilterName)
+    {
+
         IVisualizationFilter finalVf = null;
-        for(IVisualizationFilter vf : currentVisualizationFilters){
-            if(visFilterName.equals(vf.getUniqueName())){
+        for (IVisualizationFilter vf : currentVisualizationFilters)
+        {
+            if (visFilterName.equals(vf.getUniqueName()))
+            {
                 finalVf = vf;
                 break;
             }
@@ -98,22 +116,26 @@ public final class VisualizationFiltersController
         return finalVf;
     }
 
-    public static void activateVisualizationFilter(IVisualizationFilter vf){
+    public static void activateVisualizationFilter(IVisualizationFilter vf)
+    {
 
         vf.setActive(true);
     }
 
-    public static void deactivateVisualizationFilter(IVisualizationFilter vf){
+    public static void deactivateVisualizationFilter(IVisualizationFilter vf)
+    {
 
         vf.setActive(false);
 
     }
 
-    public static boolean areAllFiltersInactive(){
+    public static boolean areAllFiltersInactive()
+    {
         int counter = 0;
-        for(IVisualizationFilter vf : currentVisualizationFilters){
+        for (IVisualizationFilter vf : currentVisualizationFilters)
+        {
 
-            if(!vf.isActive()) counter++;
+            if (!vf.isActive()) counter++;
         }
 
         return counter == currentVisualizationFilters.size();
@@ -122,20 +144,22 @@ public final class VisualizationFiltersController
     public static boolean isVisibleNetworkElement(NetworkElement element)
     {
 
-        if(element == null)
+        if (element == null)
             throw new Net2PlanException("Null network elements are not allowed");
         boolean isVisible = true;
-        if(currentVisualizationFilters.size() == 0) return true;
-        if(areAllFiltersInactive()) return true;
+        if (currentVisualizationFilters.size() == 0) return true;
+        if (areAllFiltersInactive()) return true;
 
-        else{
-            if(filteringMode.equals("AND"))
+        else
+        {
+            if (filteringMode.equals("AND"))
             {
-                for(IVisualizationFilter vf : currentVisualizationFilters)
+                for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if(vf.isActive())
+                    if (vf.isActive())
                     {
-                        if(vf.isVisibleNetworkElement(element) == false){
+                        if (vf.executeFilterForNetworkElement(element) == false)
+                        {
                             isVisible = false;
                             break;
                         }
@@ -143,14 +167,15 @@ public final class VisualizationFiltersController
                     }
                 }
 
-            }
-            else{
+            } else
+            {
                 isVisible = false;
-                for(IVisualizationFilter vf : currentVisualizationFilters)
+                for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
                     if (vf.isActive())
                     {
-                        if(vf.isVisibleNetworkElement(element) == true){
+                        if (vf.executeFilterForNetworkElement(element) == true)
+                        {
                             isVisible = true;
                             break;
                         }
@@ -163,22 +188,24 @@ public final class VisualizationFiltersController
         return isVisible;
     }
 
-    public static boolean isVisibleForwardingRules(Pair<Demand,Link> fRuleKey, Double fRuleValue)
+    public static boolean isVisibleForwardingRules(Pair<Demand, Link> fRuleKey, Double fRuleValue)
     {
         if (fRuleKey == null || fRuleValue == null)
             throw new Net2PlanException("Null forwarding rules are not allowed");
         boolean isVisible = true;
-        if(currentVisualizationFilters.size() == 0) return true;
-        if(areAllFiltersInactive()) return true;
+        if (currentVisualizationFilters.size() == 0) return true;
+        if (areAllFiltersInactive()) return true;
 
-        else{
-            if(filteringMode.equals("AND"))
+        else
+        {
+            if (filteringMode.equals("AND"))
             {
-                for(IVisualizationFilter vf : currentVisualizationFilters)
+                for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if(vf.isActive())
+                    if (vf.isActive())
                     {
-                        if(vf.isVisibleForwardingRules(fRuleKey, fRuleValue) == false){
+                        if (vf.executeFilterForForwardingRule(fRuleKey, fRuleValue) == false)
+                        {
                             isVisible = false;
                             break;
                         }
@@ -186,14 +213,15 @@ public final class VisualizationFiltersController
                     }
                 }
 
-            }
-            else{
+            } else
+            {
                 isVisible = false;
-                for(IVisualizationFilter vf : currentVisualizationFilters)
+                for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
                     if (vf.isActive())
                     {
-                        if(vf.isVisibleForwardingRules(fRuleKey, fRuleValue) == true){
+                        if (vf.executeFilterForForwardingRule(fRuleKey, fRuleValue) == true)
+                        {
                             isVisible = true;
                             break;
                         }
@@ -208,11 +236,15 @@ public final class VisualizationFiltersController
 
     public enum FilteringModes
     {
-        AND ("AND"),
-        OR ("OR");
+        AND("AND"),
+        OR("OR");
 
         private final String text;
-        private FilteringModes(final String text) {this.text = text;}
+
+        private FilteringModes(final String text)
+        {
+            this.text = text;
+        }
 
         public static FilteringModes fromStringToEnum(final String text)
         {

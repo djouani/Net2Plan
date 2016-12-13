@@ -1,6 +1,6 @@
-package com.net2plan.prooves;
+package com.net2plan.examples.general.filters;
 
-import com.net2plan.gui.utils.visualizationFilters.IVisualizationFilter;
+import com.net2plan.interfaces.networkDesign.IVisualizationFilter;
 import com.net2plan.interfaces.networkDesign.Demand;
 import com.net2plan.interfaces.networkDesign.Link;
 import com.net2plan.interfaces.networkDesign.NetworkElement;
@@ -18,7 +18,7 @@ public class EvenIndexFilter implements IVisualizationFilter
     boolean active = false;
 
     @Override
-    public boolean isVisibleNetworkElement(NetworkElement element)
+    public boolean executeFilterForNetworkElement(NetworkElement element)
     {
         if(element.getIndex() % 2 == 0) return true;
 
@@ -26,7 +26,7 @@ public class EvenIndexFilter implements IVisualizationFilter
     }
 
     @Override
-    public boolean isVisibleForwardingRules(Pair<Demand, Link> fRuleKey, Double fRuleValue)
+    public boolean executeFilterForForwardingRule(Pair<Demand, Link> fRuleKey, Double fRuleValue)
     {
         return false;
     }
