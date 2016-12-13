@@ -43,18 +43,22 @@ public class VisualizationFiltersPane extends JPanel
     private JRadioButton andButton, orButton;
     private static JFileChooser fileChooser;
     private File selectedFile;
-    private final AdvancedJTable table;
+    private final AdvancedJTable filtersTable, parametersTable;
     private final static TableCellRenderer CHECKBOX_RENDERER;
-    private final static Object[] HEADER;
+    private final static Object[] HEADER, HEADER_PARAM;
     private final JTextArea descriptionArea;
     private final JTextField txt_file;
+    private final JLabel filtersLabel;
     private final Class [] columnClass;
     private Map<String, Class> implementations;
+    private List<Triple<String, String, String>> currentParameters;
+    private String currentFilterName;
 
     static
     {
         CHECKBOX_RENDERER = new CheckBoxRenderer();
         HEADER = StringUtils.arrayOf("Remove","Filter","Active");
+        HEADER_PARAM = StringUtils.arrayOf("Parameter","Value","Description");
     }
 
     public VisualizationFiltersPane(INetworkCallback mainWindow)
@@ -69,11 +73,13 @@ public class VisualizationFiltersPane extends JPanel
         FILTERS_DIRECTORY = FILTERS_DIRECTORY.isDirectory() ? FILTERS_DIRECTORY : IGUIModule.CURRENT_DIR;
 
         fileChooser = new JFileChooser(FILTERS_DIRECTORY);
-        TableModel model = new ClassAwareTableModelImpl(data, HEADER);
+        TableModel filtersModel = new ClassAwareTableModelImpl(data, HEADER);
+        TableModel parametersModel = new ClassAwareTableModelImpl2(data, HEADER_PARAM);
 
-        table = new AdvancedJTable(model);
-        TableColumn removeColumn = table.getColumn("Remove");
-        TableColumn activeColumn = table.getColumn("Active");
+        filtersTable = new AdvancedJTable(filtersModel);
+        parametersTable = new AdvancedJTable(parametersModel);
+        TableColumn removeColumn = filtersTable.getColumn("Remove");
+        TableColumn activeColumn = filtersTable.getColumn("Active");
         removeColumn.setResizable(false);
         removeColumn.setMinWidth(90);
         removeColumn.setMaxWidth(90);
@@ -82,6 +88,7 @@ public class VisualizationFiltersPane extends JPanel
         activeColumn.setMaxWidth(60);
         updateFiltersTable();
 
+        filtersLabel = new JLabel("Parameters");
         descriptionArea = new JTextArea();
         descriptionArea.setFont(new JLabel().getFont());
         descriptionArea.setLineWrap(true);
@@ -97,6 +104,7 @@ public class VisualizationFiltersPane extends JPanel
         columnClass[0] = TableButton.class;
         columnClass[1] = String.class;
         columnClass[2] = Boolean.class;
+
 
         setLayout(new MigLayout("insets 0 0 0 0", "[grow]", "[grow]"));
 
@@ -133,6 +141,8 @@ public class VisualizationFiltersPane extends JPanel
                 VisualizationFiltersController.removeAllVisualizationFilters();
                 descriptionArea.setText("");
                 txt_file.setText("");
+                filtersLabel.setText("Parameters");
+                ((DefaultTableModel) parametersTable.getModel()).setDataVector(new Object[0][3],HEADER_PARAM);
                 updateFiltersTable();
                 mainWindow.updateNetPlanView();
             }
@@ -205,18 +215,19 @@ public class VisualizationFiltersPane extends JPanel
         add(deleteAll);
         add(activeAll);
         add(deactiveAll, "spanx 3, wrap");
-        add(new JScrollPane(table), "spanx 3, grow, wrap");
+        add(new JScrollPane(filtersTable), "spanx 3, grow, wrap");
         add(new JLabel("Description"), "spanx 3, wrap");
         add(new JScrollPane(descriptionArea),"spanx 3, grow, wrap");
-
-        table.addMouseListener(new MouseListener()
+        add(filtersLabel, "spanx 3, wrap");
+        add(new JScrollPane(parametersTable),"spanx 3, grow, wrap");
+        filtersTable.addMouseListener(new MouseListener()
         {
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                int clickedRow = table.rowAtPoint(e.getPoint());
-                int clickedColumn = table.columnAtPoint(e.getPoint());
-                String selectedFilter = (String)table.getModel().getValueAt(clickedRow,1);
+                int clickedRow = filtersTable.rowAtPoint(e.getPoint());
+                int clickedColumn = filtersTable.columnAtPoint(e.getPoint());
+                String selectedFilter = (String)filtersTable.getModel().getValueAt(clickedRow,1);
 
                 if(clickedColumn == 0)
                 {
@@ -225,12 +236,17 @@ public class VisualizationFiltersPane extends JPanel
                         txt_file.setText("");
                     descriptionArea.setText("");
                     updateFiltersTable();
+                    filtersLabel.setText("Parameters");
+                    ((DefaultTableModel) parametersTable.getModel()).setDataVector(new Object[0][3],HEADER_PARAM);
                     mainWindow.updateNetPlanView();
                 }
                 else{
 
                     IVisualizationFilter vf = VisualizationFiltersController.getVisualizationFilterByName(selectedFilter);
+                    currentFilterName = selectedFilter;
+                    currentParameters = vf.getParameters();
                     descriptionArea.setText(vf.getDescription());
+                    updateParametersTable(selectedFilter);
 
                 }
 
@@ -294,6 +310,7 @@ public class VisualizationFiltersPane extends JPanel
                 IVisualizationFilter instance = ClassLoaderUtils.getInstance(f,implValue.getKey(),IVisualizationFilter.class);
                 VisualizationFiltersController.addVisualizationFilter(instance);
                 instance.setActive(false);
+                instance.setDefaultParameters();
                 ((Closeable) instance.getClass().getClassLoader()).close();
             }
             updateFiltersTable();
@@ -309,7 +326,7 @@ public class VisualizationFiltersPane extends JPanel
 
     public void updateFiltersTable(){
 
-        TableModel tm = table.getModel();
+        TableModel tm = filtersTable.getModel();
         ArrayList<IVisualizationFilter> currentVisFilters = VisualizationFiltersController.getCurrentVisualizationFilters();
         int length = currentVisFilters.size();
         Object[][] newData = new Object[length][HEADER.length];
@@ -325,12 +342,12 @@ public class VisualizationFiltersPane extends JPanel
 
         ((DefaultTableModel) tm).setDataVector(newData,HEADER);
         for(int j = 0;j<length;j++){
-            table.setCellRenderer(j,0,new TableButton("Remove"));
-            table.setCellRenderer(j,2,CHECKBOX_RENDERER);
+            filtersTable.setCellRenderer(j,0,new TableButton("Remove"));
+            filtersTable.setCellRenderer(j,2,CHECKBOX_RENDERER);
         }
 
-        TableColumn removeColumn = table.getColumn("Remove");
-        TableColumn activeColumn = table.getColumn("Active");
+        TableColumn removeColumn = filtersTable.getColumn("Remove");
+        TableColumn activeColumn = filtersTable.getColumn("Active");
         removeColumn.setResizable(false);
         removeColumn.setMinWidth(90);
         removeColumn.setMaxWidth(90);
@@ -339,6 +356,28 @@ public class VisualizationFiltersPane extends JPanel
         activeColumn.setMaxWidth(60);
 
 
+    }
+
+    public void updateParametersTable(String vfName)
+    {
+        filtersLabel.setText(vfName+" Parameters");
+        TableModel tm = parametersTable.getModel();
+        IVisualizationFilter vf = VisualizationFiltersController.getVisualizationFilterByName(vfName);
+        if(vf.getParameters() == null || vf.getParameters().isEmpty())
+        {
+            ((DefaultTableModel) tm).setDataVector(new Object[1][3],HEADER_PARAM);
+            return;
+        }
+        Object[][] newData = new Object[vf.getParameters().size()][3];
+        System.out.println("Numero de parametros de "+vfName+" es "+vf.getParameters().size());
+        for(int i = 0; i < vf.getParameters().size();i++)
+        {
+            newData[i][0] = vf.getParameters().get(i).getFirst();
+            newData[i][1] = vf.getParameters().get(i).getSecond();
+            newData[i][2] = vf.getParameters().get(i).getThird();
+        }
+
+        ((DefaultTableModel) tm).setDataVector(newData,HEADER_PARAM);
     }
 
 
@@ -368,42 +407,42 @@ public class VisualizationFiltersPane extends JPanel
     }
 
         private class ClassAwareTableModelImpl extends ClassAwareTableModel
+{
+    public ClassAwareTableModelImpl(Object[][] dataVector, Object[] columnIdentifiers)
+    {
+        super(dataVector, columnIdentifiers);
+    }
+
+    @Override
+    public Class getColumnClass(int col)
+    {
+        return columnClass[col];
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex)
+    {
+        if(VisualizationFiltersController.getCurrentVisualizationFilters().size() == 0) return false;
+        if(columnIndex == 2 || columnIndex == 0) return true;
+        return false;
+    }
+
+    @Override
+    public void setValueAt(Object value, int row, int column)
+    {
+        if(column == 2)
         {
-            public ClassAwareTableModelImpl(Object[][] dataVector, Object[] columnIdentifiers)
-            {
-                super(dataVector, columnIdentifiers);
-            }
-
-            @Override
-            public Class getColumnClass(int col)
-            {
-                return columnClass[col];
-            }
-
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex)
-            {
-                if(VisualizationFiltersController.getCurrentVisualizationFilters().size() == 0) return false;
-                if(columnIndex == 2 || columnIndex == 0) return true;
-                return false;
-            }
-
-            @Override
-            public void setValueAt(Object value, int row, int column)
-            {
-                if(column == 2)
-                {
-                    if(value == null) return;
-                    boolean visible = (Boolean) value;
-                    String filterToChange = (String)table.getModel().getValueAt(row,1);
-                    IVisualizationFilter vf = VisualizationFiltersController.getVisualizationFilterByName(filterToChange);
-                    vf.setActive(visible);
-                    super.setValueAt(value, row, column);
-                    updateFiltersTable();
-                    mainWindow.updateNetPlanView();
-                }
-            }
+            if(value == null) return;
+            boolean visible = (Boolean) value;
+            String filterToChange = (String)filtersTable.getModel().getValueAt(row,1);
+            IVisualizationFilter vf = VisualizationFiltersController.getVisualizationFilterByName(filterToChange);
+            vf.setActive(visible);
+            super.setValueAt(value, row, column);
+            updateFiltersTable();
+            mainWindow.updateNetPlanView();
         }
+    }
+}
 
             private static class SortByParameterNameComparator implements Comparator<Triple<String, String, String>>
             {
@@ -413,6 +452,41 @@ public class VisualizationFiltersPane extends JPanel
                     return o1.getFirst().compareTo(o2.getFirst());
                 }
             }
+
+    private class ClassAwareTableModelImpl2 extends ClassAwareTableModel
+    {
+        public ClassAwareTableModelImpl2(Object[][] dataVector, Object[] columnIdentifiers)
+        {
+            super(dataVector, columnIdentifiers);
+        }
+
+        @Override
+        public Class getColumnClass(int col)
+        {
+            return String.class;
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex)
+        {
+            if(VisualizationFiltersController.getCurrentVisualizationFilters().size() == 0) return false;
+            if(columnIndex == 1) return true;
+            return false;
+        }
+
+        @Override
+        public void setValueAt(Object value, int row, int column)
+        {
+            if(value == null)return;
+            String newValue = (String)value;
+            String parameterName = (String) getValueAt(row,0);
+            IVisualizationFilter vf = VisualizationFiltersController.getVisualizationFilterByName(currentFilterName);
+            vf.setParameterValue(parameterName, newValue);
+            super.setValueAt(value,row,column);
+            updateParametersTable(currentFilterName);
+            mainWindow.updateNetPlanView();
+        }
+    }
 
     private static class TableButton extends JButton implements TableCellRenderer, TableCellEditor {
         private int selectedRow;

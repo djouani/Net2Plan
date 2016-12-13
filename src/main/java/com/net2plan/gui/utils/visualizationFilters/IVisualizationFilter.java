@@ -6,6 +6,9 @@ import com.net2plan.interfaces.networkDesign.NetworkElement;
 import com.net2plan.internal.IExternal;
 import com.net2plan.utils.Pair;
 
+
+import java.util.Map;
+
 /**
  * Created by César on 15/11/2016.
  */
@@ -21,4 +24,6 @@ public interface IVisualizationFilter extends IExternal
     public String getUniqueName();
     public boolean isActive();
     public void setActive(boolean flag);
+    public void setParameterValue(String parameterName, String parameterValue);
+    public void setDefaultParameters();
 }
