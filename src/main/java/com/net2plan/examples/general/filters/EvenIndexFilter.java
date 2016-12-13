@@ -60,4 +60,14 @@ public class EvenIndexFilter implements IVisualizationFilter
     {
         active = flag;
     }
+
+    @Override
+    public void setParameterValue(String parameterName, String parameterValue) {
+
+    }
+
+    @Override
+    public void setDefaultParameters() {
+
+    }
 }

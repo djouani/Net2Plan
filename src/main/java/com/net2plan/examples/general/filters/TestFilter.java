@@ -39,4 +39,14 @@ public class TestFilter extends AbstractNetworkVisualizationFilter
     {
         return null;
     }
+
+    @Override
+    public void setParameterValue(String parameterName, String parameterValue) {
+
+    }
+
+    @Override
+    public void setDefaultParameters() {
+
+    }
 }

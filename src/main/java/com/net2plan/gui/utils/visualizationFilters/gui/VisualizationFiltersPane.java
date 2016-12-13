@@ -367,7 +367,6 @@ public class VisualizationFiltersPane extends JPanel
             return;
         }
         Object[][] newData = new Object[vf.getParameters().size()][3];
-        System.out.println("Numero de parametros de "+vfName+" es "+vf.getParameters().size());
         for(int i = 0; i < vf.getParameters().size();i++)
         {
             newData[i][0] = vf.getParameters().get(i).getFirst();

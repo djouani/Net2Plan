@@ -13,7 +13,7 @@ import java.util.List;
  * @author César
  * @date 21/11/2016
  */
-public class HigherThanFiveIndexFilter implements IVisualizationFilter
+public class HigherThanParamIndexFilter implements IVisualizationFilter
 {
     boolean active = false;
     @Override
@@ -57,5 +57,15 @@ public class HigherThanFiveIndexFilter implements IVisualizationFilter
     public void setActive(boolean flag)
     {
         active = flag;
+    }
+
+    @Override
+    public void setParameterValue(String parameterName, String parameterValue) {
+
+    }
+
+    @Override
+    public void setDefaultParameters() {
+
     }
 }
