@@ -309,6 +309,8 @@ public class VisualizationFiltersPane extends JPanel
                 VisualizationFiltersController.addVisualizationFilter(instance);
                 instance.setActive(false);
                 instance.setDefaultParameters();
+                if(instance.getUniqueName() == null)
+                    throw new Net2PlanException("Visualization Filters must have a name");
                 ((Closeable) instance.getClass().getClassLoader()).close();
             }
             updateFiltersTable();

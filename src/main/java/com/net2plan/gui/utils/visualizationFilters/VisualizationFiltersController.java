@@ -1,5 +1,7 @@
 package com.net2plan.gui.utils.visualizationFilters;
 
+import com.net2plan.gui.utils.visualizationFilters.implementations.AbstractForwardingRulesVisualizationFilter;
+import com.net2plan.gui.utils.visualizationFilters.implementations.AbstractNetworkVisualizationFilter;
 import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.utils.Pair;
 
@@ -129,16 +131,27 @@ public final class VisualizationFiltersController
 
     }
 
-    public static boolean areAllFiltersInactive()
+
+    public static boolean areAllNetworkElementFiltersInactive()
     {
-        int counter = 0;
-        for (IVisualizationFilter vf : currentVisualizationFilters)
+        boolean inactive = true;
+        for(IVisualizationFilter vf : currentVisualizationFilters)
         {
-
-            if (!vf.isActive()) counter++;
+            if(vf instanceof AbstractNetworkVisualizationFilter && vf.isActive())
+                inactive = false;
         }
+        return inactive;
+    }
 
-        return counter == currentVisualizationFilters.size();
+    public static boolean areAllForwardingRulesFiltersInactive()
+    {
+        boolean inactive = true;
+        for(IVisualizationFilter vf : currentVisualizationFilters)
+        {
+            if(vf instanceof AbstractForwardingRulesVisualizationFilter && vf.isActive())
+                inactive = false;
+        }
+        return inactive;
     }
 
     public static boolean isVisibleNetworkElement(NetworkElement element)
@@ -148,7 +161,7 @@ public final class VisualizationFiltersController
             throw new Net2PlanException("Null network elements are not allowed");
         boolean isVisible = true;
         if (currentVisualizationFilters.size() == 0) return true;
-        if (areAllFiltersInactive()) return true;
+        if (areAllNetworkElementFiltersInactive()) return true;
 
         else
         {
@@ -156,7 +169,7 @@ public final class VisualizationFiltersController
             {
                 for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if (vf.isActive())
+                    if (vf.isActive() && vf instanceof AbstractNetworkVisualizationFilter)
                     {
                         if (vf.executeFilterForNetworkElement(element) == false)
                         {
@@ -172,7 +185,7 @@ public final class VisualizationFiltersController
                 isVisible = false;
                 for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if (vf.isActive())
+                    if (vf.isActive() && vf instanceof AbstractNetworkVisualizationFilter)
                     {
                         if (vf.executeFilterForNetworkElement(element) == true)
                         {
@@ -194,7 +207,7 @@ public final class VisualizationFiltersController
             throw new Net2PlanException("Null forwarding rules are not allowed");
         boolean isVisible = true;
         if (currentVisualizationFilters.size() == 0) return true;
-        if (areAllFiltersInactive()) return true;
+        if (areAllForwardingRulesFiltersInactive()) return true;
 
         else
         {
@@ -202,7 +215,7 @@ public final class VisualizationFiltersController
             {
                 for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if (vf.isActive())
+                    if (vf.isActive() && vf instanceof AbstractForwardingRulesVisualizationFilter)
                     {
                         if (vf.executeFilterForForwardingRule(fRuleKey, fRuleValue) == false)
                         {
@@ -218,7 +231,7 @@ public final class VisualizationFiltersController
                 isVisible = false;
                 for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if (vf.isActive())
+                    if (vf.isActive()  && vf instanceof AbstractForwardingRulesVisualizationFilter)
                     {
                         if (vf.executeFilterForForwardingRule(fRuleKey, fRuleValue) == true)
                         {
