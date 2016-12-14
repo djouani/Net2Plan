@@ -1,7 +1,7 @@
 package com.net2plan.gui.utils.visualizationFilters;
 
-import com.net2plan.gui.utils.visualizationFilters.implementations.AbstractForwardingRulesVisualizationFilter;
-import com.net2plan.gui.utils.visualizationFilters.implementations.AbstractNetworkVisualizationFilter;
+import com.net2plan.gui.utils.visualizationFilters.implementations.ForwardingRulesVisualizationFilter;
+import com.net2plan.gui.utils.visualizationFilters.implementations.NetworkElementVisualizationFilter;
 import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.utils.Pair;
 
@@ -137,7 +137,7 @@ public final class VisualizationFiltersController
         boolean inactive = true;
         for(IVisualizationFilter vf : currentVisualizationFilters)
         {
-            if(vf instanceof AbstractNetworkVisualizationFilter && vf.isActive())
+            if(vf instanceof NetworkElementVisualizationFilter && vf.isActive())
                 inactive = false;
         }
         return inactive;
@@ -148,7 +148,7 @@ public final class VisualizationFiltersController
         boolean inactive = true;
         for(IVisualizationFilter vf : currentVisualizationFilters)
         {
-            if(vf instanceof AbstractForwardingRulesVisualizationFilter && vf.isActive())
+            if(vf instanceof ForwardingRulesVisualizationFilter && vf.isActive())
                 inactive = false;
         }
         return inactive;
@@ -169,7 +169,7 @@ public final class VisualizationFiltersController
             {
                 for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if (vf.isActive() && vf instanceof AbstractNetworkVisualizationFilter)
+                    if (vf.isActive() && vf instanceof NetworkElementVisualizationFilter)
                     {
                         if (vf.executeFilterForNetworkElement(element) == false)
                         {
@@ -185,7 +185,7 @@ public final class VisualizationFiltersController
                 isVisible = false;
                 for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if (vf.isActive() && vf instanceof AbstractNetworkVisualizationFilter)
+                    if (vf.isActive() && vf instanceof NetworkElementVisualizationFilter)
                     {
                         if (vf.executeFilterForNetworkElement(element) == true)
                         {
@@ -215,7 +215,7 @@ public final class VisualizationFiltersController
             {
                 for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if (vf.isActive() && vf instanceof AbstractForwardingRulesVisualizationFilter)
+                    if (vf.isActive() && vf instanceof ForwardingRulesVisualizationFilter)
                     {
                         if (vf.executeFilterForForwardingRule(fRuleKey, fRuleValue) == false)
                         {
@@ -231,7 +231,7 @@ public final class VisualizationFiltersController
                 isVisible = false;
                 for (IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    if (vf.isActive()  && vf instanceof AbstractForwardingRulesVisualizationFilter)
+                    if (vf.isActive()  && vf instanceof ForwardingRulesVisualizationFilter)
                     {
                         if (vf.executeFilterForForwardingRule(fRuleKey, fRuleValue) == true)
                         {

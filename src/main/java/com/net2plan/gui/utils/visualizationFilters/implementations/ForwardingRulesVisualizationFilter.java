@@ -13,12 +13,12 @@ import java.util.List;
  * @author Jorge San Emeterio
  * @date 13-Dec-16
  */
-public abstract class AbstractNetworkVisualizationFilter implements IVisualizationFilter
+public abstract class ForwardingRulesVisualizationFilter implements IVisualizationFilter
 {
     private boolean isActive = false;
 
     @Override
-    public abstract boolean executeFilterForNetworkElement(NetworkElement element);
+    public abstract boolean executeFilterForForwardingRule(Pair<Demand, Link> fRuleKey, Double fRuleValue);
 
     @Override
     public abstract String getDescription();
@@ -30,7 +30,7 @@ public abstract class AbstractNetworkVisualizationFilter implements IVisualizati
     public abstract String getUniqueName();
 
     @Override
-    public boolean executeFilterForForwardingRule(Pair<Demand, Link> fRuleKey, Double fRuleValue)
+    public boolean executeFilterForNetworkElement(NetworkElement element)
     {
         return true;
     }
