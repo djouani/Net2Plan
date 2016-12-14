@@ -2883,25 +2883,31 @@ public class GraphUtils
 		{
 
 			LinkedList<List<E>> paths = new LinkedList<List<E>>();
+			GraphPath<E> firstValidShortestPath = null;
 
 			if (!graph.containsVertex(startVertex) || !graph.containsVertex(endVertex) || startVertex.equals(endVertex)) return paths;
 			if (dijkstra.getDistance(startVertex, endVertex) == null) return paths;
 
 			PriorityQueue<GraphPath> priorityQueue = new PriorityQueue<GraphPath>();
-			List<E> aux = dijkstra.getPath(startVertex, endVertex);
-			double cost = GraphUtils.JUNGUtils.getPathWeight(aux, nev);
-			GraphPath<E> shortestPath = new GraphPath<E>(aux, cost);
+			List<E> shortestPathMaybeNotValidSeqLinks = dijkstra.getPath(startVertex, endVertex);
+			double cost = GraphUtils.JUNGUtils.getPathWeight(shortestPathMaybeNotValidSeqLinks, nev);
+			GraphPath<E> shortestPathMaybeNotValid = new GraphPath<E>(shortestPathMaybeNotValidSeqLinks, cost);
 
-			if (!acceptPath(shortestPath)) return paths;
-			paths.add(aux);
+//			if (!acceptPath(shortestPathMaybeNotValid)) return paths; // PABLO: a shortest path may be not valid, and longer be => not return
+//			paths.add(shortestPathMaybeNotValidSeqLinks);
+			if (acceptPath(shortestPathMaybeNotValid)) 
+			{
+				paths.add(shortestPathMaybeNotValidSeqLinks);
+				firstValidShortestPath = shortestPathMaybeNotValid;
+			}
 
 			DijkstraShortestPath<V, E> blockedDijkstra;
 
 			while (paths.size() < k)
 			{
-				List<E> curShortestPath = paths.getLast();
+				final List<E> curShortestPath = paths.isEmpty()? shortestPathMaybeNotValidSeqLinks : paths.getLast();
 
-				int currentPathLength = curShortestPath.size();
+				final int currentPathLength = curShortestPath.size();
 
 				/* Split path into Head and NextEdge */
 				for (int deviationId = 0; deviationId < currentPathLength; deviationId++)
@@ -2930,13 +2936,15 @@ public class GraphUtils
 					/* Check if we already found this solution */
 					if (priorityQueue.contains(candidate)) continue;
 
-					if (!acceptPath(candidate) || !compareCandidateToShortestPath(candidate, shortestPath)) continue;
+					if (!acceptPath(candidate)) continue;
+					if (!paths.isEmpty() && !compareCandidateToShortestPath(candidate, firstValidShortestPath)) continue;
 
 					priorityQueue.add(candidate);
 				}
 
 				if (priorityQueue.isEmpty()) break; /* No more candidate paths */
-				paths.add(priorityQueue.poll().getPath());
+				firstValidShortestPath = priorityQueue.poll();
+				paths.add(firstValidShortestPath.getPath());
 			}
 
 			return paths;
