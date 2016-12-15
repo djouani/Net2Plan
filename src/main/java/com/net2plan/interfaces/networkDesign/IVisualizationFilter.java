@@ -8,6 +8,7 @@ import com.net2plan.utils.Pair;
 
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by César on 15/11/2016.
@@ -17,13 +18,7 @@ import java.util.Map;
     //Value: Double*/
 public interface IVisualizationFilter extends IExternal
 {
-    public boolean active = false;
-    public boolean executeFilterForNetworkElement(NetworkElement element);
-    public boolean executeFilterForForwardingRule(Pair<Demand,Link> fRuleKey, Double fRuleValue);
-    public String getDescription();
-    public String getUniqueName();
-    public boolean isActive();
-    public void setActive(boolean flag);
-    public void setParameterValue(String parameterName, String parameterValue);
-    public void setDefaultParameters();
+    Set<NetworkElement> executeFilter(NetPlan netPlan, Map<String, String> filtersParameters, Map<String, String> net2PlanParameters);
+    String getDescription();
+    String getUniqueName();
 }
