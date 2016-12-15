@@ -68,6 +68,7 @@ public class AdvancedJTable_multicastTree extends AdvancedJTableNetworkElement {
 
     private NetPlan currentTopology = null;
     private List<MulticastTree> currentMulticastTrees = new LinkedList<>();
+    VisualizationFiltersController filtersController = VisualizationFiltersController.getController();
 
     public AdvancedJTable_multicastTree(final INetworkCallback networkViewer) {
         super(createTableModel(networkViewer), networkViewer, NetworkElementType.MULTICAST_TREE, true);
@@ -125,8 +126,8 @@ public class AdvancedJTable_multicastTree extends AdvancedJTableNetworkElement {
                     treeData[i] = tree.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            boolean visibleNetworkElement = VisualizationFiltersController.isVisibleNetworkElement(tree);
-            if(visibleNetworkElement)
+            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
+            if(!invisibleElements.contains(tree) || invisibleElements.size() == 0)
                  allTreeData.add(treeData);
 
             if (initialState != null && initialState.getMulticastTreeFromId(tree.getId()) != null) {
@@ -166,7 +167,8 @@ public class AdvancedJTable_multicastTree extends AdvancedJTableNetworkElement {
                         treeData_initialNetPlan[i] = tree.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleNetworkElement)
+                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
+                if(!invisibleElements.contains(tree) || invisibleElements.size() == 0)
                     allTreeData.add(treeData_initialNetPlan);
             }
         }

@@ -46,14 +46,7 @@ import com.net2plan.gui.utils.CurrentAndPlannedStateTableSorter;
 import com.net2plan.gui.utils.INetworkCallback;
 import com.net2plan.gui.utils.SwingUtils;
 import com.net2plan.gui.utils.visualizationFilters.VisualizationFiltersController;
-import com.net2plan.interfaces.networkDesign.Link;
-import com.net2plan.interfaces.networkDesign.MulticastTree;
-import com.net2plan.interfaces.networkDesign.NetPlan;
-import com.net2plan.interfaces.networkDesign.NetworkLayer;
-import com.net2plan.interfaces.networkDesign.Node;
-import com.net2plan.interfaces.networkDesign.ProtectionSegment;
-import com.net2plan.interfaces.networkDesign.Route;
-import com.net2plan.interfaces.networkDesign.SharedRiskGroup;
+import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.internal.Constants.NetworkElementType;
 import com.net2plan.internal.ErrorHandling;
 import com.net2plan.libraries.SRGUtils;
@@ -88,6 +81,7 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
 
     private List<SharedRiskGroup> currentSRGs = new LinkedList<>();
     private NetPlan currentTopology = null;
+    VisualizationFiltersController filtersController = VisualizationFiltersController.getController();
 
     public AdvancedJTable_srg(final INetworkCallback networkViewer) {
         super(createTableModel(networkViewer), networkViewer, NetworkElementType.SRG, true);
@@ -139,9 +133,9 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
                     srgData[i] = srg.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            boolean visibleNetworkElement = VisualizationFiltersController.isVisibleNetworkElement(srg);
-            if(visibleNetworkElement)
-            allSRGData.add(srgData);
+            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
+            if(!invisibleElements.contains(srg) || invisibleElements.size() == 0)
+                allSRGData.add(srgData);
 
             if (initialState != null && initialState.getSRGFromId(srg.getId()) != null) {
                 layer = initialState.getNetworkLayerDefault();
@@ -177,7 +171,8 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
                         srgData_initialNetPlan[i] = srg.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleNetworkElement)
+                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
+                if(!invisibleElements.contains(srg) || invisibleElements.size() == 0)
                     allSRGData.add(srgData_initialNetPlan);
             }
         }

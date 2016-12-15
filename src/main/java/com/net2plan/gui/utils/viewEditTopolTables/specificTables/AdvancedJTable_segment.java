@@ -34,12 +34,7 @@ import com.net2plan.gui.utils.INetworkCallback;
 import com.net2plan.gui.utils.StringLabeller;
 import com.net2plan.gui.utils.WiderJComboBox;
 import com.net2plan.gui.utils.visualizationFilters.VisualizationFiltersController;
-import com.net2plan.interfaces.networkDesign.Link;
-import com.net2plan.interfaces.networkDesign.Net2PlanException;
-import com.net2plan.interfaces.networkDesign.NetPlan;
-import com.net2plan.interfaces.networkDesign.Node;
-import com.net2plan.interfaces.networkDesign.ProtectionSegment;
-import com.net2plan.interfaces.networkDesign.Route;
+import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.internal.Constants.NetworkElementType;
 import com.net2plan.internal.ErrorHandling;
 import com.net2plan.utils.CollectionUtils;
@@ -73,6 +68,7 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
 
     private List<ProtectionSegment> currentSegments = new LinkedList<>();
     private NetPlan currentTopology = null;
+    VisualizationFiltersController filtersController = VisualizationFiltersController.getController();
 
     public AdvancedJTable_segment(final INetworkCallback networkViewer) {
         super(createTableModel(networkViewer), networkViewer, NetworkElementType.PROTECTION_SEGMENT, true);
@@ -128,9 +124,9 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
                     segmentData[i] = segment.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            boolean visibleNetworkElement = VisualizationFiltersController.isVisibleNetworkElement(segment);
-            if(visibleNetworkElement)
-            allSegmentData.add(segmentData);
+            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
+            if(!invisibleElements.contains(segment) || invisibleElements.size() == 0)
+                allSegmentData.add(segmentData);
 
             if (initialState != null && sameRoutingType && initialState.getProtectionSegmentFromId(segment.getId()) != null) {
                 segment = initialState.getProtectionSegmentFromId(segment.getId());
@@ -167,7 +163,8 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
                         segmentData_initialNetPlan[i] = segment.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleNetworkElement)
+                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
+                if(!invisibleElements.contains(segment) || invisibleElements.size() == 0)
                     allSegmentData.add(segmentData_initialNetPlan);
             }
 

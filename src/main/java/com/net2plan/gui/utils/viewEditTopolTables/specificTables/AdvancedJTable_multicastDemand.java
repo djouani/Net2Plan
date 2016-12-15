@@ -60,6 +60,7 @@ public class AdvancedJTable_multicastDemand extends AdvancedJTableNetworkElement
 
     private NetPlan currentTopology = null;
     private List<MulticastDemand> currentMulticastDemands = new LinkedList<>();
+    VisualizationFiltersController filtersController = VisualizationFiltersController.getController();
 
     public AdvancedJTable_multicastDemand(final INetworkCallback networkViewer) {
         super(createTableModel(networkViewer), networkViewer, NetworkElementType.MULTICAST_DEMAND, true);
@@ -113,8 +114,8 @@ public class AdvancedJTable_multicastDemand extends AdvancedJTableNetworkElement
                     demandData[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            boolean visibleNetworkElement = VisualizationFiltersController.isVisibleNetworkElement(demand);
-            if(visibleNetworkElement)
+            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
+            if(!invisibleElements.contains(demand) || invisibleElements.size() == 0)
                 allDemandData.add(demandData);
 
             if (initialState != null && initialState.getMulticastDemandFromId(demand.getId()) != null) {
@@ -151,7 +152,8 @@ public class AdvancedJTable_multicastDemand extends AdvancedJTableNetworkElement
                         demandData_initialNetPlan[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleNetworkElement)
+                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
+                if(!invisibleElements.contains(demand) || invisibleElements.size() == 0)
                     allDemandData.add(demandData_initialNetPlan);
             }
         }

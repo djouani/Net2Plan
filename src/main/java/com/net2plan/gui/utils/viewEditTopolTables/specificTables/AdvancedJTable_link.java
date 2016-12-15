@@ -45,17 +45,7 @@ import com.net2plan.gui.utils.INetworkCallback;
 import com.net2plan.gui.utils.StringLabeller;
 import com.net2plan.gui.utils.WiderJComboBox;
 import com.net2plan.gui.utils.visualizationFilters.VisualizationFiltersController;
-import com.net2plan.interfaces.networkDesign.Configuration;
-import com.net2plan.interfaces.networkDesign.Demand;
-import com.net2plan.interfaces.networkDesign.Link;
-import com.net2plan.interfaces.networkDesign.MulticastDemand;
-import com.net2plan.interfaces.networkDesign.MulticastTree;
-import com.net2plan.interfaces.networkDesign.NetPlan;
-import com.net2plan.interfaces.networkDesign.NetworkLayer;
-import com.net2plan.interfaces.networkDesign.Node;
-import com.net2plan.interfaces.networkDesign.ProtectionSegment;
-import com.net2plan.interfaces.networkDesign.Route;
-import com.net2plan.interfaces.networkDesign.SharedRiskGroup;
+import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.internal.Constants.NetworkElementType;
 import com.net2plan.internal.ErrorHandling;
 import com.net2plan.utils.CollectionUtils;
@@ -99,6 +89,7 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
 
     private List<Link> currentLinks = new LinkedList<>();
     private NetPlan currentTopology = null;
+    VisualizationFiltersController filtersController = VisualizationFiltersController.getController();
     public AdvancedJTable_link(final INetworkCallback networkViewer) {
         super(createTableModel(networkViewer), networkViewer, NetworkElementType.LINK, true);
         setDefaultCellRenderers(networkViewer);
@@ -182,8 +173,8 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                     linkData[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            boolean visibleNetworkElement = VisualizationFiltersController.isVisibleNetworkElement(link);
-            if(visibleNetworkElement){
+            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
+            if(!invisibleElements.contains(link) || invisibleElements.size() == 0){
                 allLinkData.add(linkData);
                 networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, true);
                 topologyPanel.getCanvas().refresh();
@@ -252,7 +243,8 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                         linkData_initialNetPlan[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleNetworkElement){
+                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
+                if(!invisibleElements.contains(link) || invisibleElements.size() == 0){
                     allLinkData.add(linkData_initialNetPlan);
                     networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, true);
                     topologyPanel.getCanvas().refresh();
@@ -261,7 +253,6 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                     networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, false);
                     topologyPanel.getCanvas().refresh();
                 }
-
             }
         }
 

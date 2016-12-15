@@ -34,6 +34,7 @@ import com.net2plan.gui.utils.WiderJComboBox;
 import com.net2plan.gui.utils.visualizationFilters.VisualizationFiltersController;
 import com.net2plan.interfaces.networkDesign.Link;
 import com.net2plan.interfaces.networkDesign.NetPlan;
+import com.net2plan.interfaces.networkDesign.NetworkElement;
 import com.net2plan.interfaces.networkDesign.Node;
 import com.net2plan.internal.Constants.NetworkElementType;
 import com.net2plan.internal.ErrorHandling;
@@ -69,8 +70,8 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
     private boolean expandAttributes = false;
     private List<Node> currentNodes = new LinkedList<>();
     private NetPlan currentTopology = null;
-    private Map<String,Boolean> hasBeenAddedEachAttColumn = new HashMap<>();
-    /**
+    VisualizationFiltersController filtersController = VisualizationFiltersController.getController();
+            /*
      * Default constructor.
      *
      * @param networkViewer The network callback
@@ -128,8 +129,8 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
                     nodeData[i] = node.getAttribute(attributesTitles.get(i-netPlanViewTableHeader.length));
                 }
             }
-            boolean visibleNetworkElement = VisualizationFiltersController.isVisibleNetworkElement(node);
-            if(visibleNetworkElement)
+            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
+            if(!invisibleElements.contains(node) || invisibleElements.size() == 0)
             {
                 allNodeData.add(nodeData);
                 networkViewer.getTopologyPanel().getCanvas().setNodeVisible(node, true);
@@ -170,7 +171,8 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
                     }
 
                 }
-                if(visibleNetworkElement)
+                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
+                if(!invisibleElements.contains(node) || invisibleElements.size() == 0)
                 {
                     allNodeData.add(nodeData_initialNetPlan);
                     networkViewer.getTopologyPanel().getCanvas().setNodeVisible(node, true);
@@ -178,7 +180,6 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
                 else{
                     networkViewer.getTopologyPanel().getCanvas().setNodeVisible(node, false);
                 }
-
                 topologyPanel.getCanvas().refresh();
             }
         }

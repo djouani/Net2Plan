@@ -42,14 +42,14 @@ public class VisualizationFiltersPane extends JPanel
     private static JFileChooser fileChooser;
     private File selectedFile;
     private final AdvancedJTable filtersTable;
+    private AdvancedJTable parametersTable;
     private final static TableCellRenderer CHECKBOX_RENDERER;
-    private final static Object[] HEADER;
+    private final static Object[] HEADER, HEADER_PARAM;
     private final JTextArea descriptionArea;
     private final JTextField txt_file;
     private final JLabel filtersLabel;
     private final Class [] columnClass;
     private Map<String, Class> implementations;
-    private ParameterValueDescriptionPanel parametersPane;
     private VisualizationFiltersController filtersController;
     private List<Triple<String, String, String>> currentParameters;
     private String currentFilterName;
@@ -58,6 +58,7 @@ public class VisualizationFiltersPane extends JPanel
     {
         CHECKBOX_RENDERER = new CheckBoxRenderer();
         HEADER = StringUtils.arrayOf("Remove","Filter","Active");
+        HEADER_PARAM = StringUtils.arrayOf("Parameter","Value","Description");
     }
 
     public VisualizationFiltersPane(INetworkCallback mainWindow)
@@ -68,15 +69,17 @@ public class VisualizationFiltersPane extends JPanel
 
         filtersController = VisualizationFiltersController.getController();
         Object[][] data = {{null, null, null}};
+        Object[][] data2 = {{null,null,null}};
         //HAY QUE CAMBIARLO
         File FILTERS_DIRECTORY = new File("C:/Users/cesar_000/Desktop/N2P Work/target/classes/com/net2plan/prooves");
         FILTERS_DIRECTORY = FILTERS_DIRECTORY.isDirectory() ? FILTERS_DIRECTORY : IGUIModule.CURRENT_DIR;
 
         fileChooser = new JFileChooser(FILTERS_DIRECTORY);
         TableModel filtersModel = new ClassAwareTableModelImpl(data, HEADER);
+        TableModel parametersModel = new ClassAwareTableModelImpl2(data2, HEADER_PARAM);
 
         filtersTable = new AdvancedJTable(filtersModel);
-        parametersPane = new ParameterValueDescriptionPanel();
+        parametersTable = new AdvancedJTable(parametersModel);
         TableColumn removeColumn = filtersTable.getColumn("Remove");
         TableColumn activeColumn = filtersTable.getColumn("Active");
         removeColumn.setResizable(false);
@@ -141,7 +144,7 @@ public class VisualizationFiltersPane extends JPanel
                 descriptionArea.setText("");
                 txt_file.setText("");
                 filtersLabel.setText("Parameters");
-                //((DefaultTableModel) parametersTable.getModel()).setDataVector(new Object[0][3],HEADER_PARAM);
+                ((DefaultTableModel) parametersTable.getModel()).setDataVector(new Object[0][3],HEADER_PARAM);
                 updateFiltersTable();
                 mainWindow.updateNetPlanView();
             }
@@ -218,7 +221,7 @@ public class VisualizationFiltersPane extends JPanel
         add(new JLabel("Description"), "spanx 3, wrap");
         add(new JScrollPane(descriptionArea),"spanx 3, grow, wrap");
         add(filtersLabel, "spanx 3, wrap");
-        add(parametersPane,"spanx 3, grow, wrap");
+        add(new JScrollPane(parametersTable),"spanx 3, grow, wrap");
         filtersTable.addMouseListener(new MouseListener()
         {
             @Override
@@ -236,14 +239,13 @@ public class VisualizationFiltersPane extends JPanel
                     descriptionArea.setText("");
                     updateFiltersTable();
                     filtersLabel.setText("Parameters");
-                    //((DefaultTableModel) parametersTable.getModel()).setDataVector(new Object[0][3],HEADER_PARAM);
+                    ((DefaultTableModel) parametersTable.getModel()).setDataVector(new Object[0][2],HEADER_PARAM);
                     mainWindow.updateNetPlanView();
                 }
                 else{
 
                     IVisualizationFilter vf = filtersController.getVisualizationFilterByName(selectedFilter);
                     currentFilterName = selectedFilter;
-                    currentParameters = vf.getParameters();
                     descriptionArea.setText(vf.getDescription());
                     updateParametersTable(selectedFilter);
 
@@ -361,8 +363,87 @@ public class VisualizationFiltersPane extends JPanel
     public void updateParametersTable(String vfName)
     {
         filtersLabel.setText(vfName+" Parameters");
+        setParameters(vfName);
 
     }
+
+    public void setParameters(String vfName) {
+
+        Map<String, String> parameters = filtersController.getFilterParameters(vfName);
+        List<Triple<String, String, String>> defaultParameters = filtersController.getDefaultParameters(vfName);
+        Object[][] data = new Object[parameters.size()][HEADER_PARAM.length];
+        int counter = 0;
+        for(Triple<String, String, String> t : defaultParameters) {
+
+            String defaultValue = t.getSecond().toLowerCase(Locale.getDefault());
+                    if (defaultValue.startsWith("#select#")) {
+                        String auxOptions = defaultValue.replaceFirst("#select#", "").trim();
+                        String[] options = StringUtils.split(auxOptions, ", ");
+                        if (options.length > 0) {
+                            data[counter][0] = t.getFirst();
+                            data[counter][1] = options[0];
+                            data[counter][2] = t.getThird();
+                            addComboCellEditor(options, counter, 1);
+                            counter++;
+                            continue;
+                        }
+                    } else if (defaultValue.startsWith("#boolean#")) {
+                        boolean isSelected = Boolean.parseBoolean(parameters.get(t.getFirst()));
+                        data[counter][0] = t.getFirst();
+                        data[counter][1] = Boolean.toString(isSelected);
+                        data[counter][2] = t.getThird();
+                        addCheckboxCellEditor(isSelected, counter, 1);
+                        counter++;
+                        continue;
+                    }
+                    else{
+                        data[counter][0] = t.getFirst();
+                        data[counter][1] = parameters.get(t.getFirst());
+                        data[counter][2] = t.getThird();
+                        addTextCellEditor(counter,1);
+                        counter++;
+                        continue;
+                    }
+
+                }
+        ((DefaultTableModel)parametersTable.getModel()).setDataVector(data, HEADER_PARAM);
+
+            }
+
+    private void addCheckboxCellEditor(boolean defaultValue, int rowIndex, int columnIndex) {
+        JCheckBox checkBox = new JCheckBox();
+        checkBox.setHorizontalAlignment(JLabel.CENTER);
+        checkBox.setSelected(defaultValue);
+        parametersTable.setCellEditor(rowIndex, columnIndex, new DefaultCellEditor(checkBox));
+        parametersTable.setCellRenderer(rowIndex, columnIndex, CHECKBOX_RENDERER);
+    }
+
+    private void addComboCellEditor(String[] options, int rowIndex, int columnIndex) {
+        JComboBox comboBox = new JComboBox();
+        for (String option : options) comboBox.addItem(option);
+        parametersTable.setCellEditor(rowIndex, columnIndex, new DefaultCellEditor(comboBox));
+    }
+
+    private void addTextCellEditor(int rowIndex, int columnIndex){
+        JTextField textField = new JTextField();
+        parametersTable.setCellEditor(rowIndex, columnIndex, new DefaultCellEditor(textField));
+        parametersTable.setCellRenderer(rowIndex, columnIndex, new DefaultTableCellRenderer());
+    }
+
+    public Map<String, String> getParameters() {
+        Map<String, String> out = new LinkedHashMap<String, String>();
+
+            TableModel model = parametersTable.getModel();
+
+            int numRows = model.getRowCount();
+            for (int rowId = 0; rowId < numRows; rowId++)
+                out.put(model.getValueAt(rowId, 0).toString(), model.getValueAt(rowId, 1).toString());
+
+
+        return out;
+    }
+
+
 
 
     private static class CheckBoxRenderer extends JCheckBox implements TableCellRenderer
@@ -434,6 +515,9 @@ public class VisualizationFiltersPane extends JPanel
     }
 }
 
+
+
+
             private static class SortByParameterNameComparator implements Comparator<Triple<String, String, String>>
             {
                 @Override
@@ -460,8 +544,27 @@ public class VisualizationFiltersPane extends JPanel
         public boolean isCellEditable(int rowIndex, int columnIndex)
         {
             if(filtersController.getCurrentVisualizationFilters().size() == 0) return false;
-            if(columnIndex == 1) return true;
+
+            if (columnIndex == 1) {
+                int rowView = parametersTable.convertRowIndexToModel(rowIndex);
+                int columnView = parametersTable.convertColumnIndexToView(columnIndex);
+                TableCellEditor tce = parametersTable.getCellEditor(rowView, columnView);
+
+                if (tce instanceof ActionTableCellEditor) {
+                    return true;
+                } else if (tce instanceof DefaultCellEditor) {
+                    Component cellComponent = ((DefaultCellEditor) tce).getComponent();
+                    if (cellComponent instanceof JComboBox || cellComponent instanceof JCheckBox) {
+                        return true;
+                    } else {
+                        Constants.RunnableCodeType runnableCodeType = Constants.RunnableCodeType.find(getValueAt(rowIndex, 1).toString());
+                        if (runnableCodeType == null) return true;
+                    }
+                }
+            }
+
             return false;
+
         }
 
         @Override
@@ -470,10 +573,8 @@ public class VisualizationFiltersPane extends JPanel
             if(value == null)return;
             String newValue = (String)value;
             String parameterName = (String) getValueAt(row,0);
-            IVisualizationFilter vf = filtersController.getVisualizationFilterByName(currentFilterName);
-            //vf.setParameterValue(parameterName, newValue);
+            filtersController.updateParameter(currentFilterName,parameterName,newValue);
             super.setValueAt(value,row,column);
-            updateParametersTable(currentFilterName);
             mainWindow.updateNetPlanView();
         }
     }

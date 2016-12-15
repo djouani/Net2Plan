@@ -38,7 +38,7 @@ public class VisualizationFiltersController
         return filtersController;
     }
 
-    public  void addVisualizationFilter(IVisualizationFilter vf)
+    public void addVisualizationFilter(IVisualizationFilter vf)
     {
 
         if (containsVisualizationFilter(vf))
@@ -105,9 +105,30 @@ public class VisualizationFiltersController
         filtersParameters.put(vfName, param);
     }
 
+    public String getParameterDescription(String vfName, String parameter)
+    {
+        String descr = "";
+        IVisualizationFilter vf = getVisualizationFilterByName(vfName);
+        for(Triple<String, String, String> t : vf.getParameters())
+        {
+            if(parameter.equals(t.getFirst()))
+            {
+                descr = t.getThird();
+                break;
+            }
+        }
+        return descr;
+    }
+
     public Map<String, String> getFilterParameters(String vfName)
     {
         return filtersParameters.get(vfName);
+    }
+
+    public List<Triple<String, String, String>> getDefaultParameters(String vfName)
+    {
+        IVisualizationFilter vf = getVisualizationFilterByName(vfName);
+        return vf.getParameters();
     }
 
     public  void removeAllVisualizationFilters()
@@ -193,13 +214,16 @@ public class VisualizationFiltersController
         if(!(getCurrentVisualizationFilters().size() == 0) || !areAllFiltersInactive())
         {
 
-            if(filteringMode.equals("OR"))
+            if(filteringMode.equals("AND"))
             {
                 Set<NetworkElement> filterSet = new HashSet<>();
                 for(IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    filterSet = vf.executeFilter(netPlan, getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
-                    elemSet.addAll(filterSet);
+                    if(isVisualizationFilterActive(vf))
+                    {
+                        filterSet = vf.executeFilter(netPlan, getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
+                        elemSet.addAll(filterSet);
+                    }
                 }
 
             }
@@ -209,24 +233,27 @@ public class VisualizationFiltersController
                 boolean contains = true;
                 for(IVisualizationFilter vf : currentVisualizationFilters)
                 {
-                    filterSet = vf.executeFilter(netPlan, getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
-                    filterSets.add(filterSet);
-                }
-                for(NetworkElement elem : filterSets.get(0))
-                {
-                    contains = true;
-                    for(Set<NetworkElement> set : filterSets)
+                    if(isVisualizationFilterActive(vf))
                     {
-                        if(!set.contains(elem))
-                        {
-                            contains = false;
-                            break;
+                        filterSet = vf.executeFilter(netPlan, getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
+                        filterSets.add(filterSet);
+                    }
+                }
+                if(filterSets.size() > 0)
+                {
+                    for (NetworkElement elem : filterSets.get(0)) {
+                        contains = true;
+                        for (Set<NetworkElement> set : filterSets) {
+                            if (!set.contains(elem)) {
+                                contains = false;
+                                break;
+                            }
+
                         }
+                        if (contains)
+                            elemSet.add(elem);
 
                     }
-                    if(contains)
-                        elemSet.add(elem);
-
                 }
 
             }

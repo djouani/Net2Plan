@@ -56,13 +56,7 @@ import com.net2plan.gui.utils.StringLabeller;
 import com.net2plan.gui.utils.SwingUtils;
 import com.net2plan.gui.utils.WiderJComboBox;
 import com.net2plan.gui.utils.visualizationFilters.VisualizationFiltersController;
-import com.net2plan.interfaces.networkDesign.Demand;
-import com.net2plan.interfaces.networkDesign.Link;
-import com.net2plan.interfaces.networkDesign.Net2PlanException;
-import com.net2plan.interfaces.networkDesign.NetPlan;
-import com.net2plan.interfaces.networkDesign.Node;
-import com.net2plan.interfaces.networkDesign.ProtectionSegment;
-import com.net2plan.interfaces.networkDesign.Route;
+import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.internal.Constants.NetworkElementType;
 import com.net2plan.internal.ErrorHandling;
 import com.net2plan.libraries.GraphUtils;
@@ -99,6 +93,7 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
 
     private List<Route> currentRoutes = new LinkedList<>();
     private NetPlan currentTopology = null;
+    VisualizationFiltersController filtersController = VisualizationFiltersController.getController();
 
     public AdvancedJTable_route(final INetworkCallback networkViewer) {
         super(createTableModel(networkViewer), networkViewer, NetworkElementType.ROUTE, true);
@@ -156,9 +151,12 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
                     routeData[i] = route.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            boolean visibleNetworkElement = VisualizationFiltersController.isVisibleNetworkElement(route);
-            if(visibleNetworkElement)
+            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
+            if(!invisibleElements.contains(route) || invisibleElements.size() == 0)
+            {
                 allRouteData.add(routeData);
+            }
+
 
             if (initialState != null && sameRoutingType && initialState.getRouteFromId(route.getId()) != null) {
                 route = initialState.getRouteFromId(route.getId());
@@ -196,8 +194,11 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
                         routeData_initialNetPlan[i] = route.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleNetworkElement)
+                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
+                if(!invisibleElements.contains(route) || invisibleElements.size() == 0)
+                {
                     allRouteData.add(routeData_initialNetPlan);
+                }
             }
         }
 

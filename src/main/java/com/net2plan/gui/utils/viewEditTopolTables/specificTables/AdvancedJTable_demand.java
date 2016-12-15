@@ -159,7 +159,7 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
                 }
                 invisibleElements = filtersController.getVisibleNetworkElements(initialState);
                 if(!invisibleElements.contains(demand) || invisibleElements.size() == 0)
-                    allDemandData.add(demandData);
+                    allDemandData.add(demandData_initialNetPlan);
             }
         }
 
