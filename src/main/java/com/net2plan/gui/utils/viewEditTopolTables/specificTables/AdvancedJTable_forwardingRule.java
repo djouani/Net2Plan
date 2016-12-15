@@ -98,9 +98,7 @@ public class AdvancedJTable_forwardingRule extends AdvancedJTableNetworkElement 
             forwardingRuleData[COLUMN_OUTGOINGLINK] = link.getIndex() + " (" + originNode.getIndex() + (originNodeName.isEmpty() ? "" : " (" + originNodeName + ")") + " -> " + destinationNode.getIndex() + (destinationNodeName.isEmpty() ? "" : " (" + destinationNodeName + ")") + ")";
             forwardingRuleData[COLUMN_SPLITTINGRATIO] = currentState.getForwardingRuleSplittingFactor(demand, link);
             forwardingRuleData[COLUMN_CARRIEDTRAFFIC] = currentState.getForwardingRuleCarriedTraffic(demand, link);
-            boolean visibleFRule = VisualizationFiltersController.isVisibleForwardingRules(demandLinkPair,currentState.getForwardingRuleSplittingFactor(demand, link));
-            if(visibleFRule)
-                allForwardingRuleData.add(forwardingRuleData);
+
 
             if (initialState != null && sameRoutingType && initialState.getDemandFromId(demand.getId()) != null && initialState.getLinkFromId(link.getId()) != null) {
                 demand = initialState.getDemandFromId(demand.getId());
@@ -119,8 +117,7 @@ public class AdvancedJTable_forwardingRule extends AdvancedJTableNetworkElement 
                 forwardingRuleData_initialNetPlan[COLUMN_OUTGOINGLINK] = null;
                 forwardingRuleData_initialNetPlan[COLUMN_SPLITTINGRATIO] = currentState.getForwardingRuleSplittingFactor(demand, link);
                 forwardingRuleData_initialNetPlan[COLUMN_CARRIEDTRAFFIC] = currentState.getForwardingRuleCarriedTraffic(demand, link);
-                if(visibleFRule)
-                    allForwardingRuleData.add(forwardingRuleData_initialNetPlan);
+
             }
         }
         return allForwardingRuleData;

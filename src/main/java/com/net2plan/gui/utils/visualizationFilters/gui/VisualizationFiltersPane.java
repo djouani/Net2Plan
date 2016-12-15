@@ -50,6 +50,7 @@ public class VisualizationFiltersPane extends JPanel
     private final Class [] columnClass;
     private Map<String, Class> implementations;
     private ParameterValueDescriptionPanel parametersPane;
+    private VisualizationFiltersController filtersController;
     private List<Triple<String, String, String>> currentParameters;
     private String currentFilterName;
 
@@ -65,6 +66,7 @@ public class VisualizationFiltersPane extends JPanel
 
         this.mainWindow = mainWindow;
 
+        filtersController = VisualizationFiltersController.getController();
         Object[][] data = {{null, null, null}};
         //HAY QUE CAMBIARLO
         File FILTERS_DIRECTORY = new File("C:/Users/cesar_000/Desktop/N2P Work/target/classes/com/net2plan/prooves");
@@ -135,7 +137,7 @@ public class VisualizationFiltersPane extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                VisualizationFiltersController.removeAllVisualizationFilters();
+                filtersController.removeAllVisualizationFilters();
                 descriptionArea.setText("");
                 txt_file.setText("");
                 filtersLabel.setText("Parameters");
@@ -153,7 +155,7 @@ public class VisualizationFiltersPane extends JPanel
                 if (andButton.isSelected())
                 {
                     orButton.setSelected(false);
-                    VisualizationFiltersController.updateFilteringMode("AND");
+                    filtersController.updateFilteringMode("AND");
                     mainWindow.updateNetPlanView();
                 }
             }
@@ -167,7 +169,7 @@ public class VisualizationFiltersPane extends JPanel
                 if (orButton.isSelected())
                 {
                     andButton.setSelected(false);
-                    VisualizationFiltersController.updateFilteringMode("OR");
+                    filtersController.updateFilteringMode("OR");
                     mainWindow.updateNetPlanView();
                 }
             }
@@ -178,9 +180,9 @@ public class VisualizationFiltersPane extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                for(IVisualizationFilter vf : VisualizationFiltersController.getCurrentVisualizationFilters())
+                for(IVisualizationFilter vf : filtersController.getCurrentVisualizationFilters())
                 {
-                    VisualizationFiltersController.activateVisualizationFilter(vf);
+                    filtersController.activateVisualizationFilter(vf);
                 }
                 updateFiltersTable();
                 mainWindow.updateNetPlanView();
@@ -192,9 +194,9 @@ public class VisualizationFiltersPane extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                for(IVisualizationFilter vf : VisualizationFiltersController.getCurrentVisualizationFilters())
+                for(IVisualizationFilter vf : filtersController.getCurrentVisualizationFilters())
                 {
-                    VisualizationFiltersController.deactivateVisualizationFilter(vf);
+                    filtersController.deactivateVisualizationFilter(vf);
                 }
                 updateFiltersTable();
                 mainWindow.updateNetPlanView();
@@ -228,8 +230,8 @@ public class VisualizationFiltersPane extends JPanel
 
                 if(clickedColumn == 0)
                 {
-                    VisualizationFiltersController.removeVisualizationFilter(selectedFilter);
-                    if(VisualizationFiltersController.getCurrentVisualizationFilters().size() == 0)
+                    filtersController.removeVisualizationFilter(selectedFilter);
+                    if(filtersController.getCurrentVisualizationFilters().size() == 0)
                         txt_file.setText("");
                     descriptionArea.setText("");
                     updateFiltersTable();
@@ -239,7 +241,7 @@ public class VisualizationFiltersPane extends JPanel
                 }
                 else{
 
-                    IVisualizationFilter vf = VisualizationFiltersController.getVisualizationFilterByName(selectedFilter);
+                    IVisualizationFilter vf = filtersController.getVisualizationFilterByName(selectedFilter);
                     currentFilterName = selectedFilter;
                     currentParameters = vf.getParameters();
                     descriptionArea.setText(vf.getDescription());
@@ -305,8 +307,8 @@ public class VisualizationFiltersPane extends JPanel
             for(Map.Entry<String,Class> implValue : implementations.entrySet())
             {
                 IVisualizationFilter instance = ClassLoaderUtils.getInstance(f,implValue.getKey(),IVisualizationFilter.class);
-                VisualizationFiltersController.addVisualizationFilter(instance);
-                VisualizationFiltersController.deactivateVisualizationFilter(instance);
+                filtersController.addVisualizationFilter(instance);
+                filtersController.deactivateVisualizationFilter(instance);
                 if(instance.getUniqueName() == null)
                     throw new Net2PlanException("Visualization Filters must have a name");
                 ((Closeable) instance.getClass().getClassLoader()).close();
@@ -325,7 +327,7 @@ public class VisualizationFiltersPane extends JPanel
     public void updateFiltersTable(){
 
         TableModel tm = filtersTable.getModel();
-        ArrayList<IVisualizationFilter> currentVisFilters = VisualizationFiltersController.getCurrentVisualizationFilters();
+        ArrayList<IVisualizationFilter> currentVisFilters = filtersController.getCurrentVisualizationFilters();
         int length = currentVisFilters.size();
         Object[][] newData = new Object[length][HEADER.length];
         IVisualizationFilter vf;
@@ -334,7 +336,7 @@ public class VisualizationFiltersPane extends JPanel
             vf = currentVisFilters.get(i);
             newData[i][0] = new TableButton("Remove");
             newData[i][1] = vf.getUniqueName();
-            newData[i][2] = VisualizationFiltersController.isVisualizationFilterActive(vf);
+            newData[i][2] = filtersController.isVisualizationFilterActive(vf);
         }
 
 
@@ -404,7 +406,7 @@ public class VisualizationFiltersPane extends JPanel
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex)
     {
-        if(VisualizationFiltersController.getCurrentVisualizationFilters().size() == 0) return false;
+        if(filtersController.getCurrentVisualizationFilters().size() == 0) return false;
         if(columnIndex == 2 || columnIndex == 0) return true;
         return false;
     }
@@ -417,13 +419,13 @@ public class VisualizationFiltersPane extends JPanel
             if(value == null) return;
             boolean active = (Boolean) value;
             String filterToChange = (String)filtersTable.getModel().getValueAt(row,1);
-            IVisualizationFilter vf = VisualizationFiltersController.getVisualizationFilterByName(filterToChange);
+            IVisualizationFilter vf = filtersController.getVisualizationFilterByName(filterToChange);
             if(active)
             {
-                VisualizationFiltersController.activateVisualizationFilter(vf);
+                filtersController.activateVisualizationFilter(vf);
             }
             else{
-                VisualizationFiltersController.deactivateVisualizationFilter(vf);
+                filtersController.deactivateVisualizationFilter(vf);
             }
             super.setValueAt(value, row, column);
             updateFiltersTable();
@@ -457,7 +459,7 @@ public class VisualizationFiltersPane extends JPanel
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex)
         {
-            if(VisualizationFiltersController.getCurrentVisualizationFilters().size() == 0) return false;
+            if(filtersController.getCurrentVisualizationFilters().size() == 0) return false;
             if(columnIndex == 1) return true;
             return false;
         }
@@ -468,7 +470,7 @@ public class VisualizationFiltersPane extends JPanel
             if(value == null)return;
             String newValue = (String)value;
             String parameterName = (String) getValueAt(row,0);
-            IVisualizationFilter vf = VisualizationFiltersController.getVisualizationFilterByName(currentFilterName);
+            IVisualizationFilter vf = filtersController.getVisualizationFilterByName(currentFilterName);
             //vf.setParameterValue(parameterName, newValue);
             super.setValueAt(value,row,column);
             updateParametersTable(currentFilterName);

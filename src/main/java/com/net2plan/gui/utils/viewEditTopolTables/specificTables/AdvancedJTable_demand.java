@@ -33,13 +33,7 @@ import com.net2plan.gui.utils.INetworkCallback;
 import com.net2plan.gui.utils.StringLabeller;
 import com.net2plan.gui.utils.WiderJComboBox;
 import com.net2plan.gui.utils.visualizationFilters.VisualizationFiltersController;
-import com.net2plan.interfaces.networkDesign.Demand;
-import com.net2plan.interfaces.networkDesign.Link;
-import com.net2plan.interfaces.networkDesign.Net2PlanException;
-import com.net2plan.interfaces.networkDesign.NetPlan;
-import com.net2plan.interfaces.networkDesign.NetworkLayer;
-import com.net2plan.interfaces.networkDesign.Node;
-import com.net2plan.interfaces.networkDesign.Route;
+import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.internal.Constants.NetworkElementType;
 import com.net2plan.internal.ErrorHandling;
 import com.net2plan.utils.CollectionUtils;
@@ -71,6 +65,7 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
 
     private NetPlan currentTopology = null;
     private List<Demand> currentDemands = new LinkedList<>();
+    VisualizationFiltersController filtersController = VisualizationFiltersController.getController();
     /**
      * Default constructor.
      *
@@ -129,8 +124,8 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
                     demandData[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            boolean visibleNetworkElement = VisualizationFiltersController.isVisibleNetworkElement(demand);
-            if(visibleNetworkElement)
+            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
+            if(!invisibleElements.contains(demand) || invisibleElements.size() == 0)
                 allDemandData.add(demandData);
 
             if (initialState != null && initialState.getDemandFromId(demand.getId()) != null) {
@@ -162,8 +157,9 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
                         demandData_initialNetPlan[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleNetworkElement)
-                    allDemandData.add(demandData_initialNetPlan);
+                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
+                if(!invisibleElements.contains(demand) || invisibleElements.size() == 0)
+                    allDemandData.add(demandData);
             }
         }
 
