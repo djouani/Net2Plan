@@ -7,6 +7,7 @@ import com.net2plan.internal.IExternal;
 import com.net2plan.utils.Pair;
 
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ import java.util.Set;
     //Value: Double*/
 public interface IVisualizationFilter extends IExternal
 {
-    Set<NetworkElement> executeFilter(NetPlan netPlan, Map<String, String> filtersParameters, Map<String, String> net2PlanParameters);
+    Map<Class<? extends NetworkElement>, Set<NetworkElement>> executeFilter(NetPlan netPlan, NetworkLayer layer, Map<String, String> filtersParameters, Map<String, String> net2PlanParameters);
     String getDescription();
     String getUniqueName();
 }

@@ -74,7 +74,6 @@ public abstract class AdvancedJTableNetworkElement extends AdvancedJTable {
 
     private ArrayList<String> attributesColumnsNames;
     private boolean expandAttributes = false;
-    private List<NetworkElement> currentNetworkElements = new LinkedList<>();
     private NetPlan currentTopology = null;
     private Map<String,Boolean> hasBeenAddedEachAttColumn = new HashMap<>();
 
@@ -713,37 +712,6 @@ public abstract class AdvancedJTableNetworkElement extends AdvancedJTable {
     private void attributesInDifferentColumns()
     {
         currentTopology = networkViewer.getDesign();
-        Map<String,String>  networkElementAttributes = new HashMap<>();
-
-        switch(networkElementType){
-            case NODE:
-                currentNetworkElements = new LinkedList<>(currentTopology.getNodes());
-                break;
-            case LINK:
-                currentNetworkElements = new LinkedList<>(currentTopology.getLinks());
-                break;
-            case DEMAND:
-                currentNetworkElements = new LinkedList<>(currentTopology.getDemands());
-                break;
-            case MULTICAST_DEMAND:
-                currentNetworkElements = new LinkedList<>(currentTopology.getMulticastDemands());
-                break;
-            case ROUTE:
-                currentNetworkElements = new LinkedList<>(currentTopology.getRoutes());
-                break;
-            case MULTICAST_TREE:
-                currentNetworkElements = new LinkedList<>(currentTopology.getMulticastTrees());
-                break;
-            case PROTECTION_SEGMENT:
-                currentNetworkElements = new LinkedList<>(currentTopology.getProtectionSegments());
-                break;
-            case SRG:
-                currentNetworkElements = new LinkedList<>(currentTopology.getSRGs());
-                break;
-            default:
-                throw new RuntimeException("Bad");
-
-        }
         attributesColumnsNames = getAttributesColumnsHeaders();
         boolean attributesColumnInMainTable = false;
         String currentColumnName = null;
@@ -768,7 +736,6 @@ public abstract class AdvancedJTableNetworkElement extends AdvancedJTable {
                 networkViewer.updateNetPlanView();
                 createDefaultColumnsFromModel();
                 removedColumns.clear();
-                String tcName = null;
                 if (!hiddenColumns.isEmpty())
                 {
                     for (TableColumn tc : hiddenColumns)

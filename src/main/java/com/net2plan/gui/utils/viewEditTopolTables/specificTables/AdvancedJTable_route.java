@@ -151,8 +151,8 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
                     routeData[i] = route.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
-            if(!invisibleElements.contains(route) || invisibleElements.size() == 0)
+            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Route.class);
+            if(visibleElements == null || visibleElements.contains(route))
             {
                 allRouteData.add(routeData);
             }
@@ -194,8 +194,8 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
                         routeData_initialNetPlan[i] = route.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
-                if(!invisibleElements.contains(route) || invisibleElements.size() == 0)
+                visibleElements = filtersController.getVisibleNetworkElements(initialState, Route.class);
+                if(visibleElements == null || visibleElements.contains(route))
                 {
                     allRouteData.add(routeData_initialNetPlan);
                 }

@@ -571,9 +571,25 @@ public class VisualizationFiltersPane extends JPanel
         public void setValueAt(Object value, int row, int column)
         {
             if(value == null)return;
-            String newValue = (String)value;
-            String parameterName = (String) getValueAt(row,0);
-            filtersController.updateParameter(currentFilterName,parameterName,newValue);
+            if(value instanceof Boolean)
+            {
+                boolean flag = (Boolean)value;
+                String newParamValue = "";
+                if(flag)
+                    newParamValue = "true";
+                else{
+                    newParamValue = "false";
+                }
+                String parameterName = (String) getValueAt(row,0);
+                filtersController.updateParameter(currentFilterName,parameterName,newParamValue);
+            }
+            else{
+                String newValue = (String)value;
+                String parameterName = (String) getValueAt(row,0);
+                filtersController.updateParameter(currentFilterName,parameterName,newValue);
+            }
+
+
             super.setValueAt(value,row,column);
             mainWindow.updateNetPlanView();
         }

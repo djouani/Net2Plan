@@ -133,8 +133,8 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
                     srgData[i] = srg.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
-            if(!invisibleElements.contains(srg) || invisibleElements.size() == 0)
+            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, SharedRiskGroup.class);
+            if(visibleElements == null || visibleElements.contains(srg))
                 allSRGData.add(srgData);
 
             if (initialState != null && initialState.getSRGFromId(srg.getId()) != null) {
@@ -171,8 +171,8 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
                         srgData_initialNetPlan[i] = srg.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
-                if(!invisibleElements.contains(srg) || invisibleElements.size() == 0)
+                visibleElements = filtersController.getVisibleNetworkElements(initialState, SharedRiskGroup.class);
+                if(visibleElements == null || visibleElements.contains(srg))
                     allSRGData.add(srgData_initialNetPlan);
             }
         }

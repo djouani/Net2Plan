@@ -173,8 +173,8 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                     linkData[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
-            if(!invisibleElements.contains(link) || invisibleElements.size() == 0){
+            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Link.class);
+            if(visibleElements == null || visibleElements.contains(link)){
                 allLinkData.add(linkData);
                 networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, true);
                 topologyPanel.getCanvas().refresh();
@@ -243,8 +243,8 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                         linkData_initialNetPlan[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
-                if(!invisibleElements.contains(link) || invisibleElements.size() == 0){
+                visibleElements = filtersController.getVisibleNetworkElements(initialState, Link.class);
+                if(visibleElements == null || visibleElements.contains(link)){
                     allLinkData.add(linkData_initialNetPlan);
                     networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, true);
                     topologyPanel.getCanvas().refresh();

@@ -124,8 +124,8 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
                     demandData[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
-            if(!invisibleElements.contains(demand) || invisibleElements.size() == 0)
+            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Demand.class);
+            if(visibleElements == null || visibleElements.contains(demand))
                 allDemandData.add(demandData);
 
             if (initialState != null && initialState.getDemandFromId(demand.getId()) != null) {
@@ -157,8 +157,8 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
                         demandData_initialNetPlan[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
-                if(!invisibleElements.contains(demand) || invisibleElements.size() == 0)
+                visibleElements = filtersController.getVisibleNetworkElements(initialState, Demand.class);
+                if(visibleElements == null || visibleElements.contains(demand))
                     allDemandData.add(demandData_initialNetPlan);
             }
         }

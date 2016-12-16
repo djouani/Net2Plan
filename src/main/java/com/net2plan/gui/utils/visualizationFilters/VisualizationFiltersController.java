@@ -208,35 +208,34 @@ public class VisualizationFiltersController
     }
 
 
-    public  Set<NetworkElement> getVisibleNetworkElements(NetPlan netPlan)
+    public Set<NetworkElement> getVisibleNetworkElements(NetPlan netPlan, Class networkTypeClass)
     {
+        Map<Class<? extends NetworkElement>, Set<NetworkElement>> elementsMap = new HashMap<>();
         Set<NetworkElement> elemSet = new LinkedHashSet<>();
         if(!(getCurrentVisualizationFilters().size() == 0) || !areAllFiltersInactive())
         {
 
-            if(filteringMode.equals("AND"))
+            if(filteringMode.equals("OR"))
             {
-                Set<NetworkElement> filterSet = new HashSet<>();
                 for(IVisualizationFilter vf : currentVisualizationFilters)
                 {
                     if(isVisualizationFilterActive(vf))
                     {
-                        filterSet = vf.executeFilter(netPlan, getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
-                        elemSet.addAll(filterSet);
+                        elementsMap = vf.executeFilter(netPlan, netPlan.getNetworkLayerDefault(), getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
+                        elemSet.addAll(elementsMap.get(networkTypeClass));
                     }
                 }
 
             }
             else{
                 ArrayList<Set<NetworkElement>> filterSets = new ArrayList<>();
-                Set<NetworkElement> filterSet = new HashSet<>();
                 boolean contains = true;
                 for(IVisualizationFilter vf : currentVisualizationFilters)
                 {
                     if(isVisualizationFilterActive(vf))
                     {
-                        filterSet = vf.executeFilter(netPlan, getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
-                        filterSets.add(filterSet);
+                        elementsMap = vf.executeFilter(netPlan, netPlan.getNetworkLayerDefault(), getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
+                        filterSets.add(elementsMap.get(networkTypeClass));
                     }
                 }
                 if(filterSets.size() > 0)
@@ -259,7 +258,9 @@ public class VisualizationFiltersController
             }
 
         }
-
+        else{
+            elemSet = null;
+        }
         return elemSet;
     }
 

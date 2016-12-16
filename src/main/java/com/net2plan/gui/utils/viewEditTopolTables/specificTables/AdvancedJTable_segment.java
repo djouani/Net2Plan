@@ -124,8 +124,8 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
                     segmentData[i] = segment.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> invisibleElements = filtersController.getVisibleNetworkElements(currentState);
-            if(!invisibleElements.contains(segment) || invisibleElements.size() == 0)
+            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, ProtectionSegment.class);
+            if(visibleElements == null || visibleElements.contains(segment))
                 allSegmentData.add(segmentData);
 
             if (initialState != null && sameRoutingType && initialState.getProtectionSegmentFromId(segment.getId()) != null) {
@@ -163,8 +163,8 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
                         segmentData_initialNetPlan[i] = segment.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                invisibleElements = filtersController.getVisibleNetworkElements(initialState);
-                if(!invisibleElements.contains(segment) || invisibleElements.size() == 0)
+                visibleElements = filtersController.getVisibleNetworkElements(initialState, ProtectionSegment.class);
+                if(visibleElements == null || visibleElements.contains(segment))
                     allSegmentData.add(segmentData_initialNetPlan);
             }
 
