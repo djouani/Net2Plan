@@ -105,21 +105,6 @@ public class VisualizationFiltersController
         filtersParameters.put(vfName, param);
     }
 
-    public String getParameterDescription(String vfName, String parameter)
-    {
-        String descr = "";
-        IVisualizationFilter vf = getVisualizationFilterByName(vfName);
-        for(Triple<String, String, String> t : vf.getParameters())
-        {
-            if(parameter.equals(t.getFirst()))
-            {
-                descr = t.getThird();
-                break;
-            }
-        }
-        return descr;
-    }
-
     public Map<String, String> getFilterParameters(String vfName)
     {
         return filtersParameters.get(vfName);
@@ -223,9 +208,13 @@ public class VisualizationFiltersController
                     {
                         elementsMap = vf.executeFilter(netPlan, netPlan.getNetworkLayerDefault(), getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
                         if(elementsMap.get(networkTypeClass) != null)
+                        {
                             elemSet.addAll(elementsMap.get(networkTypeClass));
+                        }
                     }
                 }
+                if(elemSet.size() == 0)
+                    elemSet = null;
 
             }
             else{
@@ -237,7 +226,9 @@ public class VisualizationFiltersController
                     {
                         elementsMap = vf.executeFilter(netPlan, netPlan.getNetworkLayerDefault(), getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
                         if(elementsMap.get(networkTypeClass) != null)
+                        {
                             filterSets.add(elementsMap.get(networkTypeClass));
+                        }
                     }
                 }
                 if(filterSets.size() > 0)
@@ -256,6 +247,8 @@ public class VisualizationFiltersController
                             elemSet.add(elem);
 
                     }
+                    if(elemSet.size() == 0)
+                        return null;
                 }
 
             }

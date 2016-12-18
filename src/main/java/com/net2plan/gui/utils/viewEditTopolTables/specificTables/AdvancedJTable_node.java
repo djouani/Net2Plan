@@ -109,6 +109,15 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
             Set<Link> outgoingLinks = node.getOutgoingLinks();
             Set<Link> incomingLinks = node.getIncomingLinks();
 
+            if(visibleElements == null || visibleElements.contains(node))
+            {
+                topologyPanel.getCanvas().setNodeVisible(node, true);
+                topologyPanel.getCanvas().refresh();
+            }
+            else{
+                topologyPanel.getCanvas().setNodeVisible(node, false);
+                topologyPanel.getCanvas().refresh();
+            }
             Object[] nodeData = new Object[netPlanViewTableHeader.length + attributesTitles.size()];
             nodeData[0] = node.getId();
             nodeData[1] = node.getIndex();
@@ -137,12 +146,7 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
             if(visibleElements == null || visibleElements.contains(node))
             {
                 allNodeData.add(nodeData);
-                networkViewer.getTopologyPanel().getCanvas().setNodeVisible(node, true);
             }
-            else{
-                networkViewer.getTopologyPanel().getCanvas().setNodeVisible(node, false);
-            }
-            topologyPanel.getCanvas().refresh();
 
             if (initialState != null && initialState.getNodeFromId(node.getId()) != null) {
                 node = initialState.getNodeFromId(node.getId());
@@ -176,14 +180,8 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
 
                 }
                 if(visibleElements_initial == null || visibleElements_initial.contains(node))
-                {
                     allNodeData.add(nodeData_initialNetPlan);
-                    networkViewer.getTopologyPanel().getCanvas().setNodeVisible(node, true);
-                }
-                else{
-                    networkViewer.getTopologyPanel().getCanvas().setNodeVisible(node, false);
-                }
-                topologyPanel.getCanvas().refresh();
+
             }
         }
         return allNodeData;

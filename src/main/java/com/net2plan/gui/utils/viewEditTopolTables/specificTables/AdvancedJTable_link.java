@@ -127,6 +127,15 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
             visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Link.class);
         }
         for (Link link : currentState.getLinks()) {
+
+            if(visibleElements == null || visibleElements.contains(link)){
+                topologyPanel.getCanvas().setLinkVisible(link, true);
+                topologyPanel.getCanvas().refresh();
+            }
+            else{
+                topologyPanel.getCanvas().setLinkVisible(link, false);
+                topologyPanel.getCanvas().refresh();
+            }
             Set<SharedRiskGroup> srgIds_thisLink = link.getSRGs();
             Set<Route> traversingRoutes = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? link.getTraversingRoutes() : new LinkedHashSet<Route>();
             Set<ProtectionSegment> traversingSegments = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? link.getTraversingProtectionSegments() : new LinkedHashSet<ProtectionSegment>();
@@ -183,15 +192,8 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                     linkData[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            if(visibleElements == null || visibleElements.contains(link)){
+            if(visibleElements == null || visibleElements.contains(link))
                 allLinkData.add(linkData);
-                networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, true);
-                topologyPanel.getCanvas().refresh();
-            }
-            else{
-                networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, false);
-                topologyPanel.getCanvas().refresh();
-            }
 
             if (initialState != null && initialState.getLinkFromId(link.getId()) != null) {
                 link = initialState.getLinkFromId(link.getId());
@@ -252,15 +254,9 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                         linkData_initialNetPlan[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleElements_initial == null || visibleElements_initial.contains(link)){
+                if(visibleElements_initial == null || visibleElements_initial.contains(link))
                     allLinkData.add(linkData_initialNetPlan);
-                    networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, true);
-                    topologyPanel.getCanvas().refresh();
-                }
-                else{
-                    networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, false);
-                    topologyPanel.getCanvas().refresh();
-                }
+
             }
         }
 

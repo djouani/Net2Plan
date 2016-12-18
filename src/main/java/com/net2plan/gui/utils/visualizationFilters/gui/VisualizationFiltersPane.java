@@ -69,14 +69,12 @@ public class VisualizationFiltersPane extends JPanel
 
         filtersController = VisualizationFiltersController.getController();
         Object[][] data = {{null, null, null}};
-        Object[][] data2 = {{null,null,null}};
-        //HAY QUE CAMBIARLO
-        File FILTERS_DIRECTORY = new File("C:/Users/cesar_000/Desktop/N2P Work/target/classes/com/net2plan/prooves");
+        File FILTERS_DIRECTORY = new File(IGUIModule.CURRENT_DIR + SystemUtils.getDirectorySeparator() + "workspace");
         FILTERS_DIRECTORY = FILTERS_DIRECTORY.isDirectory() ? FILTERS_DIRECTORY : IGUIModule.CURRENT_DIR;
 
         fileChooser = new JFileChooser(FILTERS_DIRECTORY);
         TableModel filtersModel = new ClassAwareTableModelImpl(data, HEADER);
-        TableModel parametersModel = new ClassAwareTableModelImpl2(data2, HEADER_PARAM);
+        TableModel parametersModel = new ClassAwareTableModelImpl2(data, HEADER_PARAM);
 
         filtersTable = new AdvancedJTable(filtersModel);
         parametersTable = new AdvancedJTable(parametersModel);
@@ -373,6 +371,7 @@ public class VisualizationFiltersPane extends JPanel
         List<Triple<String, String, String>> defaultParameters = filtersController.getDefaultParameters(vfName);
         Object[][] data = new Object[parameters.size()][HEADER_PARAM.length];
         int counter = 0;
+        parametersTable.removeAll();
         for(Triple<String, String, String> t : defaultParameters) {
 
             String defaultValue = t.getSecond().toLowerCase(Locale.getDefault());
@@ -388,7 +387,8 @@ public class VisualizationFiltersPane extends JPanel
                             continue;
                         }
                     } else if (defaultValue.startsWith("#boolean#")) {
-                        boolean isSelected = Boolean.parseBoolean(parameters.get(t.getFirst()));
+                        String flag = parameters.get(t.getFirst()).replaceFirst("#select#", "").trim();
+                        boolean isSelected = Boolean.parseBoolean(flag);
                         data[counter][0] = t.getFirst();
                         data[counter][1] = Boolean.toString(isSelected);
                         data[counter][2] = t.getThird();
@@ -422,6 +422,7 @@ public class VisualizationFiltersPane extends JPanel
         JComboBox comboBox = new JComboBox();
         for (String option : options) comboBox.addItem(option);
         parametersTable.setCellEditor(rowIndex, columnIndex, new DefaultCellEditor(comboBox));
+        parametersTable.setCellRenderer(rowIndex, columnIndex, new DefaultTableCellRenderer());
     }
 
     private void addTextCellEditor(int rowIndex, int columnIndex){
