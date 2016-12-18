@@ -90,8 +90,16 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesColumns) {
         final boolean sameRoutingType = initialState != null && initialState.getRoutingType() == currentState.getRoutingType();
         List<Object[]> allSegmentData = new LinkedList<Object[]>();
-        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, ProtectionSegment.class);
-        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, ProtectionSegment.class);
+        Set<NetworkElement> visibleElements = null;
+        Set<NetworkElement> visibleElements_initial = null;
+        if(currentState != null)
+        {
+            visibleElements = filtersController.getVisibleNetworkElements(currentState, ProtectionSegment.class);
+        }
+        if(initialState != null)
+        {
+            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, ProtectionSegment.class);
+        }
         for (ProtectionSegment segment : currentState.getProtectionSegments()) {
             List<Link> seqLinks = segment.getSeqLinks();
             List<Node> seqNodes = segment.getSeqNodes();

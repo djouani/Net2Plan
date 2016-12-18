@@ -32,10 +32,7 @@ import com.net2plan.gui.utils.CurrentAndPlannedStateTableSorter;
 import com.net2plan.gui.utils.INetworkCallback;
 import com.net2plan.gui.utils.WiderJComboBox;
 import com.net2plan.gui.utils.visualizationFilters.VisualizationFiltersController;
-import com.net2plan.interfaces.networkDesign.Link;
-import com.net2plan.interfaces.networkDesign.NetPlan;
-import com.net2plan.interfaces.networkDesign.NetworkElement;
-import com.net2plan.interfaces.networkDesign.Node;
+import com.net2plan.interfaces.networkDesign.*;
 import com.net2plan.internal.Constants.NetworkElementType;
 import com.net2plan.internal.ErrorHandling;
 import com.net2plan.utils.CollectionUtils;
@@ -98,9 +95,16 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
 
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesTitles) {
         List<Object[]> allNodeData = new LinkedList<Object[]>();
-        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Node.class);
-        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Node.class);
-
+        Set<NetworkElement> visibleElements = null;
+        Set<NetworkElement> visibleElements_initial = null;
+        if(currentState != null)
+        {
+            visibleElements = filtersController.getVisibleNetworkElements(currentState, Node.class);
+        }
+        if(initialState != null)
+        {
+            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Node.class);
+        }
         for (Node node : currentState.getNodes()) {
             Set<Link> outgoingLinks = node.getOutgoingLinks();
             Set<Link> incomingLinks = node.getIncomingLinks();

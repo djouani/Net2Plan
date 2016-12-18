@@ -116,8 +116,16 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
         if (initialState != null) for (Link link : initialState.getLinks())
             max_rho_e_initialNetPlan = Math.max(max_rho_e_initialNetPlan, link.getOccupiedCapacityIncludingProtectionSegments() / link.getCapacity());
         List<Object[]> allLinkData = new LinkedList<Object[]>();
-        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Link.class);
-        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Link.class);
+        Set<NetworkElement> visibleElements = null;
+        Set<NetworkElement> visibleElements_initial = null;
+        if(currentState != null)
+        {
+            visibleElements = filtersController.getVisibleNetworkElements(currentState, Link.class);
+        }
+        if(initialState != null)
+        {
+            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Link.class);
+        }
         for (Link link : currentState.getLinks()) {
             Set<SharedRiskGroup> srgIds_thisLink = link.getSRGs();
             Set<Route> traversingRoutes = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? link.getTraversingRoutes() : new LinkedHashSet<Route>();

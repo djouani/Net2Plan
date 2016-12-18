@@ -95,8 +95,16 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
 
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesColumns) {
         List<Object[]> allDemandData = new LinkedList<Object[]>();
-        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Demand.class);
-        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Demand.class);
+        Set<NetworkElement> visibleElements = null;
+        Set<NetworkElement> visibleElements_initial = null;
+        if(currentState != null)
+        {
+            visibleElements = filtersController.getVisibleNetworkElements(currentState, Demand.class);
+        }
+        if(initialState != null)
+        {
+            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Demand.class);
+        }
         for (Demand demand : currentState.getDemands()) {
             Set<Route> routes_thisDemand = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? demand.getRoutes() : new LinkedHashSet<Route>();
             Link coupledLink = demand.getCoupledLink();

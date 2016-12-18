@@ -222,7 +222,8 @@ public class VisualizationFiltersController
                     if(isVisualizationFilterActive(vf))
                     {
                         elementsMap = vf.executeFilter(netPlan, netPlan.getNetworkLayerDefault(), getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
-                        elemSet.addAll(elementsMap.get(networkTypeClass));
+                        if(elementsMap.get(networkTypeClass) != null)
+                            elemSet.addAll(elementsMap.get(networkTypeClass));
                     }
                 }
 
@@ -235,12 +236,14 @@ public class VisualizationFiltersController
                     if(isVisualizationFilterActive(vf))
                     {
                         elementsMap = vf.executeFilter(netPlan, netPlan.getNetworkLayerDefault(), getFilterParameters(vf.getUniqueName()), Configuration.getNet2PlanOptions());
-                        filterSets.add(elementsMap.get(networkTypeClass));
+                        if(elementsMap.get(networkTypeClass) != null)
+                            filterSets.add(elementsMap.get(networkTypeClass));
                     }
                 }
                 if(filterSets.size() > 0)
                 {
-                    for (NetworkElement elem : filterSets.get(0)) {
+                    Set<NetworkElement> elements = filterSets.get(0);
+                    for (NetworkElement elem : elements) {
                         contains = true;
                         for (Set<NetworkElement> set : filterSets) {
                             if (!set.contains(elem)) {
