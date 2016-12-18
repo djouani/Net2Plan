@@ -214,7 +214,10 @@ public class VisualizationFiltersController
                     }
                 }
                 if(elemSet.size() == 0)
-                    elemSet = null;
+                {
+                    return null;
+                }
+
 
             }
             else{
@@ -234,7 +237,8 @@ public class VisualizationFiltersController
                 if(filterSets.size() > 0)
                 {
                     Set<NetworkElement> elements = filterSets.get(0);
-                    for (NetworkElement elem : elements) {
+                    for (NetworkElement elem : elements)
+                    {
                         contains = true;
                         for (Set<NetworkElement> set : filterSets) {
                             if (!set.contains(elem)) {
@@ -247,15 +251,17 @@ public class VisualizationFiltersController
                             elemSet.add(elem);
 
                     }
-                    if(elemSet.size() == 0)
-                        return null;
+
+                }
+                else{
+                    return null;
                 }
 
             }
 
         }
         else{
-            elemSet = null;
+            return null;
         }
         return elemSet;
     }
