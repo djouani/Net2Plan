@@ -81,6 +81,8 @@ public class AdvancedJTable_multicastDemand extends AdvancedJTableNetworkElement
 
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesColumns) {
         List<Object[]> allDemandData = new LinkedList<Object[]>();
+        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, MulticastDemand.class);
+        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, MulticastDemand.class);
         for (MulticastDemand demand : currentState.getMulticastDemands()) {
             Set<MulticastTree> multicastTreeIds_thisDemand = demand.getMulticastTrees();
             Set<Link> coupledLinks = demand.getCoupledLinks();
@@ -114,7 +116,6 @@ public class AdvancedJTable_multicastDemand extends AdvancedJTableNetworkElement
                     demandData[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, MulticastDemand.class);
             if(visibleElements == null || visibleElements.contains(demand))
                 allDemandData.add(demandData);
 
@@ -152,8 +153,7 @@ public class AdvancedJTable_multicastDemand extends AdvancedJTableNetworkElement
                         demandData_initialNetPlan[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                visibleElements = filtersController.getVisibleNetworkElements(initialState, MulticastDemand.class);
-                if(visibleElements == null || visibleElements.contains(demand))
+                if(visibleElements_initial == null || visibleElements_initial.contains(demand))
                     allDemandData.add(demandData_initialNetPlan);
             }
         }

@@ -90,6 +90,8 @@ public class AdvancedJTable_multicastTree extends AdvancedJTableNetworkElement {
 
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesColumns) {
         List<Object[]> allTreeData = new LinkedList<Object[]>();
+        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, MulticastTree.class);
+        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, MulticastTree.class);
         for (MulticastTree tree : currentState.getMulticastTrees()) {
             MulticastDemand demand = tree.getMulticastDemand();
             double maxUtilization = 0;
@@ -126,7 +128,6 @@ public class AdvancedJTable_multicastTree extends AdvancedJTableNetworkElement {
                     treeData[i] = tree.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, MulticastTree.class);
             if(visibleElements == null || visibleElements.contains(tree))
                  allTreeData.add(treeData);
 
@@ -167,8 +168,7 @@ public class AdvancedJTable_multicastTree extends AdvancedJTableNetworkElement {
                         treeData_initialNetPlan[i] = tree.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                visibleElements = filtersController.getVisibleNetworkElements(initialState, MulticastTree.class);
-                if(visibleElements == null || visibleElements.contains(tree))
+                if(visibleElements_initial == null || visibleElements_initial.contains(tree))
                     allTreeData.add(treeData_initialNetPlan);
             }
         }

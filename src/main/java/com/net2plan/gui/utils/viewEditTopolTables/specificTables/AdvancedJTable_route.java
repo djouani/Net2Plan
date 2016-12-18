@@ -116,6 +116,8 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesColumns) {
         final boolean sameRoutingType = initialState != null && initialState.getRoutingType() == currentState.getRoutingType();
         List<Object[]> allRouteData = new LinkedList<Object[]>();
+        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Route.class);
+        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Route.class);
         for (Route route : currentState.getRoutes()) {
             Demand demand = route.getDemand();
             double maxUtilization = 0;
@@ -151,7 +153,6 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
                     routeData[i] = route.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Route.class);
             if(visibleElements == null || visibleElements.contains(route))
             {
                 allRouteData.add(routeData);
@@ -194,8 +195,7 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
                         routeData_initialNetPlan[i] = route.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                visibleElements = filtersController.getVisibleNetworkElements(initialState, Route.class);
-                if(visibleElements == null || visibleElements.contains(route))
+                if(visibleElements_initial == null || visibleElements_initial.contains(route))
                 {
                     allRouteData.add(routeData_initialNetPlan);
                 }

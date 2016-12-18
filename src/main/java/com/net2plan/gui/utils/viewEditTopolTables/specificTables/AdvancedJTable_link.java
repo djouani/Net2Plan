@@ -116,6 +116,8 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
         if (initialState != null) for (Link link : initialState.getLinks())
             max_rho_e_initialNetPlan = Math.max(max_rho_e_initialNetPlan, link.getOccupiedCapacityIncludingProtectionSegments() / link.getCapacity());
         List<Object[]> allLinkData = new LinkedList<Object[]>();
+        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Link.class);
+        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Link.class);
         for (Link link : currentState.getLinks()) {
             Set<SharedRiskGroup> srgIds_thisLink = link.getSRGs();
             Set<Route> traversingRoutes = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? link.getTraversingRoutes() : new LinkedHashSet<Route>();
@@ -173,7 +175,6 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                     linkData[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, Link.class);
             if(visibleElements == null || visibleElements.contains(link)){
                 allLinkData.add(linkData);
                 networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, true);
@@ -243,8 +244,7 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                         linkData_initialNetPlan[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                visibleElements = filtersController.getVisibleNetworkElements(initialState, Link.class);
-                if(visibleElements == null || visibleElements.contains(link)){
+                if(visibleElements_initial == null || visibleElements_initial.contains(link)){
                     allLinkData.add(linkData_initialNetPlan);
                     networkViewer.getTopologyPanel().getCanvas().setLinkVisible(link, true);
                     topologyPanel.getCanvas().refresh();

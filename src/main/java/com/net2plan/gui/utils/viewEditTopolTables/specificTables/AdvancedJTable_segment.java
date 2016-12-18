@@ -90,6 +90,8 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesColumns) {
         final boolean sameRoutingType = initialState != null && initialState.getRoutingType() == currentState.getRoutingType();
         List<Object[]> allSegmentData = new LinkedList<Object[]>();
+        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, ProtectionSegment.class);
+        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, ProtectionSegment.class);
         for (ProtectionSegment segment : currentState.getProtectionSegments()) {
             List<Link> seqLinks = segment.getSeqLinks();
             List<Node> seqNodes = segment.getSeqNodes();
@@ -124,7 +126,6 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
                     segmentData[i] = segment.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, ProtectionSegment.class);
             if(visibleElements == null || visibleElements.contains(segment))
                 allSegmentData.add(segmentData);
 
@@ -163,8 +164,7 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
                         segmentData_initialNetPlan[i] = segment.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                visibleElements = filtersController.getVisibleNetworkElements(initialState, ProtectionSegment.class);
-                if(visibleElements == null || visibleElements.contains(segment))
+                if(visibleElements_initial == null || visibleElements_initial.contains(segment))
                     allSegmentData.add(segmentData_initialNetPlan);
             }
 

@@ -102,6 +102,8 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesColumns) {
         NetworkLayer layer = currentState.getNetworkLayerDefault();
         List<Object[]> allSRGData = new LinkedList<Object[]>();
+        Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, SharedRiskGroup.class);
+        Set<NetworkElement> visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, SharedRiskGroup.class);
         for (SharedRiskGroup srg : currentState.getSRGs()) {
             Set<Route> routeIds_thisSRG = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? srg.getAffectedRoutes(layer) : new LinkedHashSet<Route>();
             Set<ProtectionSegment> segmentIds_thisSRG = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? srg.getAffectedProtectionSegments(layer) : new LinkedHashSet<ProtectionSegment>();
@@ -133,7 +135,6 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
                     srgData[i] = srg.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                 }
             }
-            Set<NetworkElement> visibleElements = filtersController.getVisibleNetworkElements(currentState, SharedRiskGroup.class);
             if(visibleElements == null || visibleElements.contains(srg))
                 allSRGData.add(srgData);
 
@@ -171,8 +172,7 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
                         srgData_initialNetPlan[i] = srg.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                visibleElements = filtersController.getVisibleNetworkElements(initialState, SharedRiskGroup.class);
-                if(visibleElements == null || visibleElements.contains(srg))
+                if(visibleElements_initial == null || visibleElements_initial.contains(srg))
                     allSRGData.add(srgData_initialNetPlan);
             }
         }
