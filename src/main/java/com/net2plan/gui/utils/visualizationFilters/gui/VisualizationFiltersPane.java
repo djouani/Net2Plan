@@ -381,7 +381,7 @@ public class VisualizationFiltersPane extends JPanel
                         String[] options = StringUtils.split(auxOptions, ", ");
                         if (options.length > 0) {
                             data[counter][0] = t.getFirst();
-                            data[counter][1] = options[0];
+                            data[counter][1] = parameters.get(t.getFirst());
                             data[counter][2] = t.getThird();
                             addComboCellEditor(options, counter, 1);
                             counter++;

@@ -212,7 +212,7 @@ public class VisualizationFiltersController
     {
         Map<Class<? extends NetworkElement>, Set<NetworkElement>> elementsMap = new HashMap<>();
         Set<NetworkElement> elemSet = new LinkedHashSet<>();
-        if(!(getCurrentVisualizationFilters().size() == 0) || !areAllFiltersInactive())
+        if(getCurrentVisualizationFilters().size() > 0 && !areAllFiltersInactive())
         {
 
             if(filteringMode.equals("OR"))
