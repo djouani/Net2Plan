@@ -96,14 +96,9 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesColumns) {
         List<Object[]> allDemandData = new LinkedList<Object[]>();
         Set<NetworkElement> visibleElements = null;
-        Set<NetworkElement> visibleElements_initial = null;
         if(currentState != null)
         {
             visibleElements = filtersController.getVisibleNetworkElements(currentState, Demand.class);
-        }
-        if(initialState != null)
-        {
-            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Demand.class);
         }
         for (Demand demand : currentState.getDemands()) {
             Set<Route> routes_thisDemand = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? demand.getRoutes() : new LinkedHashSet<Route>();
@@ -159,15 +154,12 @@ public class AdvancedJTable_demand extends AdvancedJTableNetworkElement {
                 demandData_initialNetPlan[11] = demand.getWorseCasePropagationTimeInMs();
                 demandData_initialNetPlan[12] = StringUtils.mapToString(demand.getAttributes());
 
-                for(int i = netPlanViewTableHeader.length; i < netPlanViewTableHeader.length + attributesColumns.size();i++)
-                {
-                    if(demand.getAttributes().containsKey(attributesColumns.get(i-netPlanViewTableHeader.length)))
-                    {
-                        demandData_initialNetPlan[i] = demand.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
+                for(int i = netPlanViewTableHeader.length; i < netPlanViewTableHeader.length + attributesColumns.size();i++) {
+                    if (demand.getAttributes().containsKey(attributesColumns.get(i - netPlanViewTableHeader.length))) {
+                        demandData_initialNetPlan[i] = demand.getAttribute(attributesColumns.get(i - netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleElements_initial == null || visibleElements_initial.contains(demand))
-                    allDemandData.add(demandData_initialNetPlan);
+                allDemandData.add(demandData_initialNetPlan);
             }
         }
 

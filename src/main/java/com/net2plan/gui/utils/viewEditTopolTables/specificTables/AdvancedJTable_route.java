@@ -117,15 +117,11 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
         final boolean sameRoutingType = initialState != null && initialState.getRoutingType() == currentState.getRoutingType();
         List<Object[]> allRouteData = new LinkedList<Object[]>();
         Set<NetworkElement> visibleElements = null;
-        Set<NetworkElement> visibleElements_initial = null;
         if(currentState != null)
         {
             visibleElements = filtersController.getVisibleNetworkElements(currentState, Route.class);
         }
-        if(initialState != null)
-        {
-            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Route.class);
-        }
+
         for (Route route : currentState.getRoutes()) {
             Demand demand = route.getDemand();
             double maxUtilization = 0;
@@ -203,10 +199,8 @@ public class AdvancedJTable_route extends AdvancedJTableNetworkElement {
                         routeData_initialNetPlan[i] = route.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleElements_initial == null || visibleElements_initial.contains(route))
-                {
-                    allRouteData.add(routeData_initialNetPlan);
-                }
+
+                allRouteData.add(routeData_initialNetPlan);
             }
         }
 

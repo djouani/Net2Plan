@@ -91,14 +91,9 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
         final boolean sameRoutingType = initialState != null && initialState.getRoutingType() == currentState.getRoutingType();
         List<Object[]> allSegmentData = new LinkedList<Object[]>();
         Set<NetworkElement> visibleElements = null;
-        Set<NetworkElement> visibleElements_initial = null;
         if(currentState != null)
         {
             visibleElements = filtersController.getVisibleNetworkElements(currentState, ProtectionSegment.class);
-        }
-        if(initialState != null)
-        {
-            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, ProtectionSegment.class);
         }
         for (ProtectionSegment segment : currentState.getProtectionSegments()) {
             List<Link> seqLinks = segment.getSeqLinks();
@@ -172,8 +167,8 @@ public class AdvancedJTable_segment extends AdvancedJTableNetworkElement {
                         segmentData_initialNetPlan[i] = segment.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleElements_initial == null || visibleElements_initial.contains(segment))
-                    allSegmentData.add(segmentData_initialNetPlan);
+
+                allSegmentData.add(segmentData_initialNetPlan);
             }
 
         }

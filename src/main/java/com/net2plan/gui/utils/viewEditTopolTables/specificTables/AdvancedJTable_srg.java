@@ -103,15 +103,11 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
             NetworkLayer layer = currentState.getNetworkLayerDefault();
             List<Object[]> allSRGData = new LinkedList<Object[]>();
             Set<NetworkElement> visibleElements = null;
-            Set<NetworkElement> visibleElements_initial = null;
             if(currentState != null)
             {
                 visibleElements = filtersController.getVisibleNetworkElements(currentState, SharedRiskGroup.class);
             }
-            if(initialState != null)
-            {
-                visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, SharedRiskGroup.class);
-        }
+
         for (SharedRiskGroup srg : currentState.getSRGs()) {
             Set<Route> routeIds_thisSRG = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? srg.getAffectedRoutes(layer) : new LinkedHashSet<Route>();
             Set<ProtectionSegment> segmentIds_thisSRG = currentState.getRoutingType() == RoutingType.SOURCE_ROUTING ? srg.getAffectedProtectionSegments(layer) : new LinkedHashSet<ProtectionSegment>();
@@ -180,8 +176,8 @@ public class AdvancedJTable_srg extends AdvancedJTableNetworkElement {
                         srgData_initialNetPlan[i] = srg.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleElements_initial == null || visibleElements_initial.contains(srg))
-                    allSRGData.add(srgData_initialNetPlan);
+
+                allSRGData.add(srgData_initialNetPlan);
             }
         }
 

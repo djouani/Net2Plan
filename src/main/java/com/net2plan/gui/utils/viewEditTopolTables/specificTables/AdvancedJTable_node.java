@@ -96,14 +96,9 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
     public List<Object[]> getAllData(NetPlan currentState, TopologyPanel topologyPanel, NetPlan initialState, ArrayList<String> attributesTitles) {
         List<Object[]> allNodeData = new LinkedList<Object[]>();
         Set<NetworkElement> visibleElements = null;
-        Set<NetworkElement> visibleElements_initial = null;
         if(currentState != null)
         {
             visibleElements = filtersController.getVisibleNetworkElements(currentState, Node.class);
-        }
-        if(initialState != null)
-        {
-            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Node.class);
         }
         for (Node node : currentState.getNodes()) {
             Set<Link> outgoingLinks = node.getOutgoingLinks();
@@ -179,8 +174,8 @@ public class AdvancedJTable_node extends AdvancedJTableNetworkElement {
                     }
 
                 }
-                if(visibleElements_initial == null || visibleElements_initial.contains(node))
-                    allNodeData.add(nodeData_initialNetPlan);
+
+                allNodeData.add(nodeData_initialNetPlan);
 
             }
         }

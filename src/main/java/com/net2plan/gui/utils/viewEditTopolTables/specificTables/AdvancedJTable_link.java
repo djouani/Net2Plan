@@ -117,14 +117,9 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
             max_rho_e_initialNetPlan = Math.max(max_rho_e_initialNetPlan, link.getOccupiedCapacityIncludingProtectionSegments() / link.getCapacity());
         List<Object[]> allLinkData = new LinkedList<Object[]>();
         Set<NetworkElement> visibleElements = null;
-        Set<NetworkElement> visibleElements_initial = null;
         if(currentState != null)
         {
             visibleElements = filtersController.getVisibleNetworkElements(currentState, Link.class);
-        }
-        if(initialState != null)
-        {
-            visibleElements_initial = filtersController.getVisibleNetworkElements(initialState, Link.class);
         }
         for (Link link : currentState.getLinks()) {
 
@@ -254,8 +249,8 @@ public class AdvancedJTable_link extends AdvancedJTableNetworkElement {
                         linkData_initialNetPlan[i] = link.getAttribute(attributesColumns.get(i-netPlanViewTableHeader.length));
                     }
                 }
-                if(visibleElements_initial == null || visibleElements_initial.contains(link))
-                    allLinkData.add(linkData_initialNetPlan);
+
+                allLinkData.add(linkData_initialNetPlan);
 
             }
         }
